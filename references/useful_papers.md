@@ -39,6 +39,12 @@ Neural Machine Translation (NMT)
 	<td> Jun 2015 </td>
 </tr>
 
+<tr>
+	<td> <a href="https://arxiv.org/abs/1508.04025" target="_blank">Effective Approaches to Attention-based Neural Machine Translation</a> </td>
+	<td>Minh-Thang Luong, Hieu Pham, Christopher D. Manning</td>
+	<td> Aug 2015 </td>
+</tr>
+
 </table>
 
 Vietnamese NLP
@@ -70,7 +76,9 @@ Back Translation</a> </td>
 	<td>Mar 2020</td>
 </tr>
 
-
-
 </table>
+
+Links
+------------
+- [`Pytorch Seq2Seq Translation Tutorial`](https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html)
 

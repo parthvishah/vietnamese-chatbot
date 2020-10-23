@@ -81,4 +81,5 @@ Back Translation</a> </td>
 Links
 ------------
 - [`Pytorch Seq2Seq Translation Tutorial`](https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html)
+- [`Pytorch Seq2Seq Tutorial for Machine Translation Youtube Video`](https://www.youtube.com/watch?v=EoGUlvhRYpk&t=127s)
 

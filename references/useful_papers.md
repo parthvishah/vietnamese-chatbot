@@ -5,22 +5,7 @@ List of papers we should read/skim for our project.
 
 Chatbot
 ------------
-<table align="center">
-<caption></caption>
-<tr>
-	<th>Paper</th>
-	<th>Author</th>
-	<th>Date</th>
-</tr>
-
-<tr>
-	<td> <a href="" target="_blank"> N/A</a> </td>
-	<td>N/A</td>
-	<td>N/A </td>
-</tr>
-
-
-</table>
+To add.
 
 Neural Machine Translation (NMT)
 ------------

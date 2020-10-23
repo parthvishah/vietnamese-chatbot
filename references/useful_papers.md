@@ -82,4 +82,5 @@ Links
 ------------
 - [`Pytorch Seq2Seq Translation Tutorial`](https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html)
 - [`Pytorch Seq2Seq Tutorial for Machine Translation Youtube Video`](https://www.youtube.com/watch?v=EoGUlvhRYpk&t=127s)
+- [`Seq2Seq Pytorch Tutorial Blog`](http://ethen8181.github.io/machine-learning/deep_learning/seq2seq/1_torch_seq2seq_intro.html)
 

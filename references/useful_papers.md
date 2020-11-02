@@ -3,9 +3,7 @@ Useful Papers
 List of papers we should read/skim for our project.
 
 
-Chatbot
-------------
-To add.
+
 
 Neural Machine Translation (NMT)
 ------------
@@ -81,9 +79,39 @@ Back Translation</a> </td>
 
 </table>
 
+BLEU score
+------------
+<table align="center">
+<caption></caption>
+<tr>
+	<th>Paper</th>
+	<th>Author</th>
+	<th>Date</th>
+	<th>Notes</th>
+</tr>
+
+<tr>
+	<td> <a href="https://www.aclweb.org/anthology/P02-1040.pdf" target="_blank"> BLEU: a Method for Automatic Evaluation of Machine Translation</a> </td>
+	<td>Kishore Papineni, Salim Roukos, Todd Ward, Wei-Jing Zhu</td>
+	<td>July 2002</td>
+	<td>Original BLEU paper: overview on the evaluation metric</td>
+</tr>
+
+
+
+<tr>
+	<td> <a href="https://www.aclweb.org/anthology/W14-3346.pdf" target="_blank">A Systematic Comparison of Smoothing Techniques for Sentence-Level BLEU</a> </td>
+	<td>Boxing Chen, Colin Cherry</td>
+	<td>June 2014</td>
+	<td>In some scenarios, BLEU does not score the translation very well, especially for those short translations with few reference sentences. Smoothing methods for BLEU will help alleviate these scenarios.</td>
+</tr>
+
+</table>
+
 Links
 ------------
 - [`Pytorch Seq2Seq Translation Tutorial`](https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html)
 - [`Pytorch Seq2Seq Tutorial for Machine Translation Youtube Video`](https://www.youtube.com/watch?v=EoGUlvhRYpk&t=127s)
 - [`Seq2Seq Pytorch Tutorial Blog`](http://ethen8181.github.io/machine-learning/deep_learning/seq2seq/1_torch_seq2seq_intro.html)
+-[`BLEU Score Blog`](https://leimao.github.io/blog/BLEU-Score/)
 

@@ -9,6 +9,7 @@ import global_variables
 import nmt_dataset
 import nnet_models_new
 
+
 def get_full_filepath(path, enc_type):
     filename = 'nmt_enc_'+enc_type+'_dec_rnn.pth'
     return os.path.join(path, filename)

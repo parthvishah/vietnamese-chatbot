@@ -25,6 +25,17 @@ path_to_train_data = {'source':main_data_path+'train.'+source_name,
 path_to_dev_data = {'source': main_data_path+'dev.'+source_name, 
                       'target':main_data_path+'dev.'+target_name}
 
+saved_language_model_dir = os.path.join(saved_models_dir, 'lang_obj')
+
+dataset_dict = {'train': nmt_dataset.LanguagePair(source_name = source_name, target_name=target_name, 
+                    filepath = path_to_train_data, 
+                    lang_obj_path = saved_language_model_dir,
+                     minimum_count = 1), 
+
+                'dev': nmt_dataset.LanguagePair(source_name = source_name, target_name=target_name, 
+                    filepath = path_to_dev_data, 
+                    lang_obj_path = saved_language_model_dir,
+                    minimum_count = 1)}
 
 def get_full_filepath(path, enc_type):
     filename = 'nmt_enc_'+enc_type+'_dec_rnn.pth'

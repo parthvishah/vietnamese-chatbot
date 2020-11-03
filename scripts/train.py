@@ -5,9 +5,25 @@ from torch.utils.data import DataLoader
 from tqdm import notebook
 from functools import partial
 import sys
+# custom modules
 import global_variables
 import nmt_dataset
 import nnet_models_new
+
+
+# set file paths
+source_name = 'en'
+target_name = 'vi'
+
+base_saved_models_dir = '/scratch/an3056/nlp_project/saved_models/'
+saved_models_dir = os.path.join(base_saved_models_dir, source_name+'2'+target_name)
+
+main_data_path = '/scratch/an3056/nlp_project/vietnamese-chatbot/data/interim/iwslt15-en-vn/'
+
+path_to_train_data = {'source':main_data_path+'train.'+source_name, 
+                      'target':main_data_path+'train.'+target_name}
+path_to_dev_data = {'source': main_data_path+'dev.'+source_name, 
+                      'target':main_data_path+'dev.'+target_name}
 
 
 def get_full_filepath(path, enc_type):

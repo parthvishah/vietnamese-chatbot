@@ -47,6 +47,36 @@ dataloader_dict = {'train': DataLoader(dataset_dict['train'], batch_size = batch
                             collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=MAX_LEN),
                             shuffle = True, num_workers=0) }
 
+# Configuration
+source_lang_obj = dataset_dict['train'].source_lang_obj
+target_lang_obj = dataset_dict['train'].target_lang_obj
+
+source_vocab = dataset_dict['train'].source_lang_obj.n_words;
+target_vocab = dataset_dict['train'].target_lang_obj.n_words;
+hidden_size = 512
+rnn_layers = 1
+lr = 0.25;
+longest_label = 1;
+gradient_clip = 0.3;
+use_cuda = True
+
+num_epochs = 10
+
+encoder_rnn = nnet_models_new.EncoderRNN(input_size = source_vocab,
+                         hidden_size = hidden_size,
+                         numlayers = rnn_layers)
+
+decoder_rnn = nnet_models_new.DecoderRNN(target_vocab, hidden_size, rnn_layers)
+
+nmt_rnn = nnet_models_new.seq2seq(encoder_rnn, decoder_rnn,
+                              lr = lr, 
+                              use_cuda = use_cuda, 
+                              hiddensize = hidden_size, 
+                              numlayers = hidden_size, 
+                              target_lang=dataset_dict['train'].target_lang_obj,
+                              longest_label = longest_label,
+                              clip = gradient_clip)
+
 def get_full_filepath(path, enc_type):
     filename = 'nmt_enc_'+enc_type+'_dec_rnn.pth'
     return os.path.join(path, filename)

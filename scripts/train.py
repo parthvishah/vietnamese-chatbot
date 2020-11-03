@@ -3,6 +3,7 @@ import time
 import torch
 from torch.utils.data import DataLoader
 from tqdm import notebook
+from tqdm import tqdm
 from functools import partial
 import sys
 # custom modules
@@ -97,7 +98,7 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
 
         print('Epoch: [{}/{}]'.format(epoch, num_epochs));
         
-        for i, data in notebook.tqdm(enumerate(dataloader['train']), total=len(dataloader['train'])):  
+        for i, data in tdqm.tqdm(enumerate(dataloader['train']), total=len(dataloader['train'])):  
             _, curr_loss = nmt.train_step(data);
             running_loss += curr_loss
 

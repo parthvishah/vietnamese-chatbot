@@ -37,6 +37,13 @@ dataset_dict = {'train': nmt_dataset.LanguagePair(source_name = source_name, tar
                     lang_obj_path = saved_language_model_dir,
                     minimum_count = 1)}
 
+dataloader_dict = {'train': DataLoader(dataset_dict['train'], batch_size = batchSize, 
+                            collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=MAX_LEN),
+                            shuffle = True, num_workers=0), 
+                    'dev': DataLoader(dataset_dict['dev'], batch_size = batchSize, 
+                            collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=MAX_LEN),
+                            shuffle = True, num_workers=0) }
+
 def get_full_filepath(path, enc_type):
     filename = 'nmt_enc_'+enc_type+'_dec_rnn.pth'
     return os.path.join(path, filename)

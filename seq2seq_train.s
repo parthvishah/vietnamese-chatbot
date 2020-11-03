@@ -19,4 +19,5 @@ module load gcc/6.3.0
 NETID=an3056
 cd /scratch/an3056/nlp_project/vietnamese-chatbot/scripts/
 source activate nmt_env
+conda list
 python train.py

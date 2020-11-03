@@ -37,6 +37,9 @@ dataset_dict = {'train': nmt_dataset.LanguagePair(source_name = source_name, tar
                     lang_obj_path = saved_language_model_dir,
                     minimum_count = 1)}
 
+MAX_LEN = int(dataset_dict['train'].main_df['source_len'].quantile(0.9999))
+batchSize = 64
+
 dataloader_dict = {'train': DataLoader(dataset_dict['train'], batch_size = batchSize, 
                             collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=MAX_LEN),
                             shuffle = True, num_workers=0), 

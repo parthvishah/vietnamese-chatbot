@@ -293,6 +293,7 @@ class seq2seq(nn.Module):
         device = torch.device(
             "cuda" if (torch.cuda.is_available() and use_cuda) else "cpu"
         )
+        print("Device is {}".format(device))
         self.device = device
         self.encoder = encoder.to(device)
         self.decoder = decoder.to(device)

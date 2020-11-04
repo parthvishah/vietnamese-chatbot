@@ -3,7 +3,7 @@ import time
 import torch
 from torch.utils.data import DataLoader
 #from tqdm import notebook
-from tqdm import tdqm
+#from tqdm import tdqm
 from functools import partial
 import sys
 # custom modules
@@ -98,7 +98,7 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
 
         print('Epoch: [{}/{}]'.format(epoch, num_epochs));
         
-        for i, data in tqdm(enumerate(dataloader['train']), total=len(dataloader['train'])):  
+        for i, data in enumerate(dataloader['train']):  
             _, curr_loss = nmt.train_step(data);
             running_loss += curr_loss
 
@@ -109,7 +109,7 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
         sys.stdout.flush()
    
         if epoch%val_every == 0:
-            val_bleu_score = nmt.get_bleu_score(dataloader['val']);
+            val_bleu_score = nmt.get_bleu_score(dataloader['dev']);
             print('validation bleu: ', val_bleu_score)
             sys.stdout.flush()
             

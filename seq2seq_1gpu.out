@@ -1,0 +1,47 @@
+/scratch/an3056/nlp_project/saved_models/en2vi/lang_obj/en_lang_obj_min_count_1.p
+/scratch/an3056/nlp_project/saved_models/en2vi/lang_obj/vi_lang_obj_min_count_1.p
+/scratch/an3056/nlp_project/saved_models/en2vi/lang_obj/en_lang_obj_min_count_1.p
+/scratch/an3056/nlp_project/saved_models/en2vi/lang_obj/vi_lang_obj_min_count_1.p
+Device is cuda
+Epoch: [0/10]
+epoch 0 loss = 1.361155397785449, time = 1156.4724237918854
+validation bleu:  0.7068754365000707
+==================================================
+Epoch: [1/10]
+epoch 1 loss = 1.12082295623151, time = 1163.9669270515442
+validation bleu:  5.175951623377636
+==================================================
+Epoch: [2/10]
+epoch 2 loss = 1.0278104620017667, time = 1176.6270656585693
+validation bleu:  5.942150541941411
+==================================================
+Epoch: [3/10]
+epoch 3 loss = 0.9820343322017226, time = 1180.2079946994781
+validation bleu:  6.7676954694206835
+==================================================
+Epoch: [4/10]
+epoch 4 loss = 0.947580364405221, time = 1181.2146952152252
+validation bleu:  6.919465618635337
+==================================================
+Epoch: [5/10]
+epoch 5 loss = 0.9244418170147364, time = 1180.3587749004364
+validation bleu:  7.440334250690371
+==================================================
+Epoch: [6/10]
+epoch 6 loss = 0.9061123175239517, time = 1179.7080042362213
+validation bleu:  7.4607644998048634
+==================================================
+Epoch: [7/10]
+epoch 7 loss = 0.8838960867785078, time = 1181.6804511547089
+validation bleu:  7.074078065333455
+Epoch     8: reducing learning rate of group 0 to 2.5000e-02.
+==================================================
+Epoch: [8/10]
+epoch 8 loss = 0.7969576755304969, time = 1183.1010353565216
+validation bleu:  8.662371577075872
+==================================================
+Epoch: [9/10]
+epoch 9 loss = 0.7675929890407616, time = 1184.9034206867218
+validation bleu:  9.017621015689425
+==================================================
+Training completed. Best BLEU is 9.017621015689425

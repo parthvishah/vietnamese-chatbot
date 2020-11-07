@@ -45,11 +45,12 @@ def main():
 	if torch.cuda.is_available():
 		torch.cuda.manual_seed_all(parser.seed)
 
-	log.info("Starting experiment {} VN -> EN NMT on {}".format(parser.experiment,device))
-
 	# set devise to CPU if available
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	log.info("Device is {}".format(device))
+
+	log.info("Starting experiment {} VN -> EN NMT on {}".format(parser.experiment,device))
+
 
 	# set file paths
 	source_name = parser.source_name

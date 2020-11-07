@@ -357,15 +357,15 @@ class seq2seq(nn.Module):
 
 		def get_bleu_score(self, val_loader):
 
-		bl = bleu_score.BLEU_SCORE();
-		predicted_list = []
-		real_list = []
+			bl = bleu_score.BLEU_SCORE();
+			predicted_list = []
+			real_list = []
 
-		for data in val_loader:
-			predicted_list += self.eval_step(data)
-			real_list += self.v2t(data.label_vecs)
+			for data in val_loader:
+				predicted_list += self.eval_step(data)
+				real_list += self.v2t(data.label_vecs)
 
-		return bl.corpus_bleu(predicted_list, [real_list])[0]
+			return bl.corpus_bleu(predicted_list, [real_list])[0]
 
 		def train_step(self, batch):
 		"""Train model to produce ys given xs.
@@ -374,44 +374,44 @@ class seq2seq(nn.Module):
 		Return estimated responses, with teacher forcing on the input sequence
 		(list of strings of length batchsize).
 		"""
-		xs, xs_len, ys = batch.text_vecs, batch.text_lens, batch.label_vecs
+			xs, xs_len, ys = batch.text_vecs, batch.text_lens, batch.label_vecs
 
-		if xs is None:
-			return
-		xs = xs.to(self.device)
-		ys = ys.to(self.device)
-		xs_len = xs_len.to(self.device)
+			if xs is None:
+				return
+			xs = xs.to(self.device)
+			ys = ys.to(self.device)
+			xs_len = xs_len.to(self.device)
 
-		bsz = xs.size(0)
-		starts = self.START.expand(bsz, 1)  # expand to batch size
-		loss = 0
-		self.zero_grad()
-		self.encoder.train()
-		self.decoder.train()
-		target_length = ys.size(1)
-		# save largest seen label for later
-		self.longest_label = max(target_length, self.longest_label)
+			bsz = xs.size(0)
+			starts = self.START.expand(bsz, 1)  # expand to batch size
+			loss = 0
+			self.zero_grad()
+			self.encoder.train()
+			self.decoder.train()
+			target_length = ys.size(1)
+			# save largest seen label for later
+			self.longest_label = max(target_length, self.longest_label)
 
-		encoder_output, encoder_hidden = self.encoder(xs)
+			encoder_output, encoder_hidden = self.encoder(xs)
 
-		# Teacher forcing: Feed the target as the next input
-		y_in = ys.narrow(1, 0, ys.size(1) - 1)
-		decoder_input = torch.cat([starts, y_in], 1)
+			# Teacher forcing: Feed the target as the next input
+			y_in = ys.narrow(1, 0, ys.size(1) - 1)
+			decoder_input = torch.cat([starts, y_in], 1)
 
-		decoder_output, decoder_hidden, _, _ = self.decoder(decoder_input,
-															encoder_hidden,
-															encoder_output,
-															xs_len
-															)
+			decoder_output, decoder_hidden, _, _ = self.decoder(decoder_input,
+																encoder_hidden,
+																encoder_output,
+																xs_len
+																)
 
 
-		scores = decoder_output.view(-1, decoder_output.size(-1))
-		loss = self.criterion(scores, ys.view(-1))
-		loss.backward()
-		self.update_params()
+			scores = decoder_output.view(-1, decoder_output.size(-1))
+			loss = self.criterion(scores, ys.view(-1))
+			loss.backward()
+			self.update_params()
 
-		_max_score, predictions = decoder_output.max(2)
-		return self.v2t(predictions), loss.item()
+			_max_score, predictions = decoder_output.max(2)
+			return self.v2t(predictions), loss.item()
 
 		def eval_step(self, batch, return_attn = False):
 		"""Generate a response to the input tokens.
@@ -421,52 +421,52 @@ class seq2seq(nn.Module):
 		"""
 			xs, xs_len = batch.text_vecs, batch.text_lens
 
-		if xs is None:
-			return
+			if xs is None:
+				return
 
-		xs = xs.to(self.device)
-		xs_len = xs_len.to(self.device)
+			xs = xs.to(self.device)
+			xs_len = xs_len.to(self.device)
 
-		bsz = xs.size(0)
-		starts = self.START.expand(bsz, 1)  # expand to batch size
-		# just predict
-		self.encoder.eval()
-		self.decoder.eval()
-		encoder_output, encoder_hidden = self.encoder(xs)
+			bsz = xs.size(0)
+			starts = self.START.expand(bsz, 1)  # expand to batch size
+			# just predict
+			self.encoder.eval()
+			self.decoder.eval()
+			encoder_output, encoder_hidden = self.encoder(xs)
 
-		predictions = []
-		done = [False for _ in range(bsz)]
-		total_done = 0
-		decoder_input = starts
-		decoder_hidden = encoder_hidden
+			predictions = []
+			done = [False for _ in range(bsz)]
+			total_done = 0
+			decoder_input = starts
+			decoder_hidden = encoder_hidden
 
-		attn_wts_list = []
-		context_vec = None;
+			attn_wts_list = []
+			context_vec = None;
 
-		for i in range(self.longest_label):
-			# generate at most longest_label tokens
+			for i in range(self.longest_label):
+				# generate at most longest_label tokens
 
-			decoder_output, decoder_hidden, attn_wts, context_vec = self.decoder(decoder_input,decoder_hidden,encoder_output,xs_len,context_vec)
+				decoder_output, decoder_hidden, attn_wts, context_vec = self.decoder(decoder_input,decoder_hidden,encoder_output,xs_len,context_vec)
 
-			_max_score, preds = decoder_output.max(2)
-			predictions.append(preds)
-			decoder_input = preds  # set input to next step
+				_max_score, preds = decoder_output.max(2)
+				predictions.append(preds)
+				decoder_input = preds  # set input to next step
 
-			attn_wts_list.append(attn_wts)
+				attn_wts_list.append(attn_wts)
 
-			# check if we've produced the end token
-			for b in range(bsz):
-				if not done[b]:
-					# only add more tokens for examples that aren't done
-					if preds[b].item() == self.END_IDX:
-						# if we produced END, we're done
-						done[b] = True
-						total_done += 1
-			if total_done == bsz:
-				# no need to generate any more
-				break
-		predictions = torch.cat(predictions, 1)
+				# check if we've produced the end token
+				for b in range(bsz):
+					if not done[b]:
+						# only add more tokens for examples that aren't done
+						if preds[b].item() == self.END_IDX:
+							# if we produced END, we're done
+							done[b] = True
+							total_done += 1
+				if total_done == bsz:
+					# no need to generate any more
+					break
+			predictions = torch.cat(predictions, 1)
 
-		if return_attn:
-			return self.v2t(predictions), attn_wts_list
-		return self.v2t(predictions)
+			if return_attn:
+				return self.v2t(predictions), attn_wts_list
+			return self.v2t(predictions)

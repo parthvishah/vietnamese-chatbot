@@ -122,7 +122,6 @@ def main():
 	nmt_rnn = nnet_models_new.seq2seq(encoder_rnn,
 									decoder_rnn,
 									lr = lr,
-									use_cuda = use_cuda,
 									hiddensize = hidden_size,
 									numlayers = hidden_size,
 									target_lang=dataset_dict['train'].target_lang_obj,

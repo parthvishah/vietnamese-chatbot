@@ -17,6 +17,7 @@ import global_variables
 import nmt_dataset
 import nnet_models_new
 import utils
+from args import args, check_args
 
 
 def main():

@@ -401,7 +401,7 @@ class seq2seq(nn.Module):
 
 		scores = decoder_output.view(-1, decoder_output.size(-1))
 		loss = self.criterion(scores, ys.view(-1))
-		print('this is the device {}'.format(device))
+		print('this is the device {}'.format(self.device))
 		loss.backward()
 		self.update_params()
 

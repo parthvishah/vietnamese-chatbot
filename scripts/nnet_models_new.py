@@ -408,10 +408,6 @@ class seq2seq(nn.Module):
 		return self.v2t(predictions), loss.item()
 
 	def eval_step(self, batch, return_attn = False):
-	"""Generate a response to the input tokens.
-	:param batch: parlai.core.torch_agent.Batch, contains tensorized version of observations.
-	Return predicted responses (list of strings of length batchsize).
-	"""
 		xs, xs_len = batch.text_vecs, batch.text_lens
 
 		if xs is None:

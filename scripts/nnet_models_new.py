@@ -280,13 +280,13 @@ class seq2seq(nn.Module):
         self,
         encoder,
         decoder,
+		device,
         lr=1e-3,
         hiddensize=128,
         numlayers=2,
         target_lang=None,
         longest_label=20,
-        clip=0.3,
-		device
+        clip=0.3
     ):
         super(seq2seq, self).__init__()
 

@@ -368,11 +368,6 @@ class seq2seq(nn.Module):
 		return bl.corpus_bleu(predicted_list, [real_list])[0]
 
 	def train_step(self, batch):
-	"""Train model to produce ys given xs.
-	:param batch: parlai.core.torch_agent.Batch, contains tensorized version of observations.
-	Return estimated responses, with teacher forcing on the input sequence
-	(list of strings of length batchsize).
-	"""
 		xs, xs_len, ys = batch.text_vecs, batch.text_lens, batch.label_vecs
 
 		if xs is None:

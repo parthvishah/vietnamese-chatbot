@@ -130,8 +130,8 @@ def main():
 									clip = gradient_clip)
 
 	train_again = False
-	if os.path.exists(get_full_filepath(saved_models_dir, 'rnn')) and (not train_again):
-		nmt_rnn = torch.load(get_full_filepath(saved_models_dir, 'rnn'), map_location=global_variables.device)
+	if os.path.exists(utils.get_full_filepath(saved_models_dir, 'rnn')) and (not train_again):
+		nmt_rnn = torch.load(utils.get_full_filepath(saved_models_dir, 'rnn'), map_location=global_variables.device)
 	else:
 		utils.train_model(dataloader_dict,
 							nmt_rnn,num_epochs = num_epochs,

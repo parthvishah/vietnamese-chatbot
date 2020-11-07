@@ -33,7 +33,6 @@ SOURCE_NAME='vi'
 TARGET_NAME='en'
 HIDDEN_SIZE=512
 RNN_LAYERS=1
-#LEARNING_RATE=0.25
 LONGEST_LABEL=1
 GRADIENT_CLIP=0.3
 EPOCHS=10
@@ -50,7 +49,6 @@ python ./vietnamese-chatbot/scripts/train_no_attention.py \
 	--target_name ${TARGET_NAME} \
 	--hidden_size ${HIDDEN_SIZE} \
 	--rnn_layers ${RNN_LAYERS} \
-	#--lr ${LEARNING_RATE} \
 	--longest_label ${LONGEST_LABEL} \
 	--gradient_clip ${GRADIENT_CLIP} \
 	--epochs ${EPOCHS}

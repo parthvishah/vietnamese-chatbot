@@ -12,6 +12,7 @@ import logging as log
 from datetime import datetime as dt
 import time
 import random
+import numpy as np
 
 # =============== Self Defined ===============
 import global_variables

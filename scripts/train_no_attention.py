@@ -11,6 +11,7 @@ import sys
 import logging as log
 from datetime import datetime as dt
 import time
+import random
 
 # =============== Self Defined ===============
 import global_variables

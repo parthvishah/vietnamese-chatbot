@@ -105,8 +105,6 @@ def main():
 	lr = 0.25
 	longest_label = parser.longest_label
 	gradient_clip = parser.gradient_clip
-	use_cuda = True
-
 	num_epochs = parser.epochs
 
 	# encoder model

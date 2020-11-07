@@ -276,207 +276,197 @@ class Decoder_SelfAttn(nn.Module):
 
 
 class seq2seq(nn.Module):
-    def __init__(
-        self,
-        encoder,
-        decoder,
-		device,
-        lr=1e-3,
-        hiddensize=128,
-        numlayers=2,
-        target_lang=None,
-        longest_label=20,
-        clip=0.3
-    ):
-        super(seq2seq, self).__init__()
+	def __init__(self,
+				encoder,
+				decoder,
+				device,
+				lr=1e3,
+				hiddensize=128,
+				numlayers=2,
+				target_lang=None,
+				longest_label=20,
+				clip=0.3
+				):
+		super(seq2seq, self).__init__()
 
 
-        print("Device is {}".format(device))
-        self.device = device
-        self.encoder = encoder.to(device)
-        self.decoder = decoder.to(device)
+		print("Device is {}".format(device))
+		self.device = device
+		self.encoder = encoder.to(device)
+		self.decoder = decoder.to(device)
 
-        self.target_lang = target_lang
+		self.target_lang = target_lang
 
-        # set up the criterion
-        self.criterion = nn.NLLLoss()
+		# set up the criterion
+		self.criterion = nn.NLLLoss()
 
-        # set up optims for each module
-        # self.optims = {
-        #     'encoder': optim.SGD(encoder.parameters(), lr=lr, nesterov=True, momentum = 0.99),
-        #     'decoder': optim.SGD(decoder.parameters(), lr=lr, nesterov=True, momentum = 0.99)
-        # }
+		self.optims = {
+		"nmt": optim.SGD(self.parameters(), lr=lr, nesterov=True, momentum=0.99)
+		}
 
-        self.optims = {
-            "nmt": optim.SGD(self.parameters(), lr=lr, nesterov=True, momentum=0.99)
-        }
+		self.scheduler = {}
+		for x in self.optims.keys():
+			self.scheduler[x] = ReduceLROnPlateau(
+			self.optims[x], mode="max", min_lr=1e-4, patience=0, verbose=True
+			)
 
-        self.scheduler = {}
-        for x in self.optims.keys():
-            self.scheduler[x] = ReduceLROnPlateau(
-                self.optims[x], mode="max", min_lr=1e-4, patience=0, verbose=True
-            )
+		self.longest_label = longest_label
+		self.hiddensize = hiddensize
+		self.numlayers = numlayers
+		self.clip = clip
+		self.START = torch.LongTensor([SOS_IDX]).to(device)
+		self.END_IDX = EOS_IDX
 
-        self.longest_label = longest_label
-        self.hiddensize = hiddensize
-        self.numlayers = numlayers
-        self.clip = clip
-        self.START = torch.LongTensor([SOS_IDX]).to(device)
-        self.END_IDX = EOS_IDX
+	def zero_grad(self):
+		"""Zero out optimizer."""
+		for optimizer in self.optims.values():
+			optimizer.zero_grad()
 
-    def zero_grad(self):
-        """Zero out optimizer."""
-        for optimizer in self.optims.values():
-            optimizer.zero_grad()
+	def update_params(self):
+		"""Do one optimization step."""
+		if self.clip is not None:
+			torch.nn.utils.clip_grad_norm_(self.encoder.parameters(), self.clip)
+			torch.nn.utils.clip_grad_norm_(self.decoder.parameters(), self.clip)
+		for optimizer in self.optims.values():
+			optimizer.step()
 
-    def update_params(self):
-        """Do one optimization step."""
-        if self.clip is not None:
-            torch.nn.utils.clip_grad_norm_(self.encoder.parameters(), self.clip)
-            torch.nn.utils.clip_grad_norm_(self.decoder.parameters(), self.clip)
-        for optimizer in self.optims.values():
-            optimizer.step()
+	def scheduler_step(self, val_bleu):
+		for scheduler in self.scheduler.values():
+			scheduler.step(val_bleu)
 
-    def scheduler_step(self, val_bleu):
-        for scheduler in self.scheduler.values():
-            scheduler.step(val_bleu)
+	def v2t(self, vector):
+		"""Convert vector to text.
+		:param vector: tensor of token indices.
+		    1-d tensors will return a string, 2-d will return a list of strings
+		"""
+		if vector.dim() == 1:
+			output_tokens = []
+			# Remove the final END_TOKEN that is appended to predictions
+			for token in vector:
+				if token == self.END_IDX:
+					break
+				else:
+					output_tokens.append(token)
+			return self.target_lang.vec2txt(output_tokens)
 
-    def v2t(self, vector):
-        """Convert vector to text.
-        :param vector: tensor of token indices.
-            1-d tensors will return a string, 2-d will return a list of strings
-        """
-        if vector.dim() == 1:
-            output_tokens = []
-            # Remove the final END_TOKEN that is appended to predictions
-            for token in vector:
-                if token == self.END_IDX:
-                    break
-                else:
-                    output_tokens.append(token)
-            return self.target_lang.vec2txt(output_tokens)
+		elif vector.dim() == 2:
+return [self.v2t(vector[i]) for i in range(vector.size(0))]
+		raise RuntimeError(
+		"Improper input to v2t with dimensions {}".format(vector.size())
+		)
 
-        elif vector.dim() == 2:
-            return [self.v2t(vector[i]) for i in range(vector.size(0))]
-        raise RuntimeError(
-            "Improper input to v2t with dimensions {}".format(vector.size())
-        )
+		def get_bleu_score(self, val_loader):
 
-    def get_bleu_score(self, val_loader):
+		bl = bleu_score.BLEU_SCORE();
+		predicted_list = []
+		real_list = []
 
-        bl = bleu_score.BLEU_SCORE();
-        predicted_list = []
-        real_list = []
+		for data in val_loader:
+			predicted_list += self.eval_step(data)
+			real_list += self.v2t(data.label_vecs)
 
-        for data in val_loader:
-            predicted_list += self.eval_step(data)
-            real_list += self.v2t(data.label_vecs)
+		return bl.corpus_bleu(predicted_list, [real_list])[0]
 
-        return bl.corpus_bleu(predicted_list, [real_list])[0]
+		def train_step(self, batch):
+		"""Train model to produce ys given xs.
+		:param batch: parlai.core.torch_agent.Batch, contains tensorized
+		              version of observations.
+		Return estimated responses, with teacher forcing on the input sequence
+		(list of strings of length batchsize).
+		"""
+		xs, xs_len, ys = batch.text_vecs, batch.text_lens, batch.label_vecs
 
-    def train_step(self, batch):
-        """Train model to produce ys given xs.
-        :param batch: parlai.core.torch_agent.Batch, contains tensorized
-                      version of observations.
-        Return estimated responses, with teacher forcing on the input sequence
-        (list of strings of length batchsize).
-        """
-        xs, xs_len, ys = batch.text_vecs, batch.text_lens, batch.label_vecs
+		if xs is None:
+			return
+		xs = xs.to(self.device)
+		ys = ys.to(self.device)
+		xs_len = xs_len.to(self.device)
 
-        if xs is None:
-            return
-        xs = xs.to(self.device)
-        ys = ys.to(self.device)
-        xs_len = xs_len.to(self.device)
+		bsz = xs.size(0)
+		starts = self.START.expand(bsz, 1)  # expand to batch size
+		loss = 0
+		self.zero_grad()
+		self.encoder.train()
+		self.decoder.train()
+		target_length = ys.size(1)
+		# save largest seen label for later
+		self.longest_label = max(target_length, self.longest_label)
 
-        bsz = xs.size(0)
-        starts = self.START.expand(bsz, 1)  # expand to batch size
-        loss = 0
-        self.zero_grad()
-        self.encoder.train()
-        self.decoder.train()
-        target_length = ys.size(1)
-        # save largest seen label for later
-        self.longest_label = max(target_length, self.longest_label)
+		encoder_output, encoder_hidden = self.encoder(xs)
 
-        encoder_output, encoder_hidden = self.encoder(xs)
+		# Teacher forcing: Feed the target as the next input
+		y_in = ys.narrow(1, 0, ys.size(1) - 1)
+		decoder_input = torch.cat([starts, y_in], 1)
 
-        # Teacher forcing: Feed the target as the next input
-        y_in = ys.narrow(1, 0, ys.size(1) - 1)
-        decoder_input = torch.cat([starts, y_in], 1)
-
-        decoder_output, decoder_hidden, _, _ = self.decoder(decoder_input,
-                                                      encoder_hidden,
-                                                      encoder_output,
-                                                      xs_len)
+		decoder_output, decoder_hidden, _, _ = self.decoder(decoder_input,
+															encoder_hidden,
+															encoder_output,
+															xs_len
+															)
 
 
-        scores = decoder_output.view(-1, decoder_output.size(-1))
-        loss = self.criterion(scores, ys.view(-1))
-        loss.backward()
-        self.update_params()
+		scores = decoder_output.view(-1, decoder_output.size(-1))
+		loss = self.criterion(scores, ys.view(-1))
+		loss.backward()
+		self.update_params()
 
-        _max_score, predictions = decoder_output.max(2)
-        return self.v2t(predictions), loss.item()
+		_max_score, predictions = decoder_output.max(2)
+		return self.v2t(predictions), loss.item()
 
-    def eval_step(self, batch, return_attn = False):
-        """Generate a response to the input tokens.
-        :param batch: parlai.core.torch_agent.Batch, contains tensorized
-                      version of observations.
-        Return predicted responses (list of strings of length batchsize).
-        """
-        xs, xs_len = batch.text_vecs, batch.text_lens
+		def eval_step(self, batch, return_attn = False):
+		"""Generate a response to the input tokens.
+		:param batch: parlai.core.torch_agent.Batch, contains tensorized
+		              version of observations.
+		Return predicted responses (list of strings of length batchsize).
+		"""
+			xs, xs_len = batch.text_vecs, batch.text_lens
 
-        if xs is None:
-            return
+		if xs is None:
+			return
 
-        xs = xs.to(self.device)
-        xs_len = xs_len.to(self.device)
+		xs = xs.to(self.device)
+		xs_len = xs_len.to(self.device)
 
-        bsz = xs.size(0)
-        starts = self.START.expand(bsz, 1)  # expand to batch size
-        # just predict
-        self.encoder.eval()
-        self.decoder.eval()
-        encoder_output, encoder_hidden = self.encoder(xs)
+		bsz = xs.size(0)
+		starts = self.START.expand(bsz, 1)  # expand to batch size
+		# just predict
+		self.encoder.eval()
+		self.decoder.eval()
+		encoder_output, encoder_hidden = self.encoder(xs)
 
-        predictions = []
-        done = [False for _ in range(bsz)]
-        total_done = 0
-        decoder_input = starts
-        decoder_hidden = encoder_hidden
+		predictions = []
+		done = [False for _ in range(bsz)]
+		total_done = 0
+		decoder_input = starts
+		decoder_hidden = encoder_hidden
 
-        attn_wts_list = []
-        context_vec = None;
+		attn_wts_list = []
+		context_vec = None;
 
-        for i in range(self.longest_label):
-            # generate at most longest_label tokens
+		for i in range(self.longest_label):
+			# generate at most longest_label tokens
 
-            decoder_output, decoder_hidden, attn_wts, context_vec = self.decoder(decoder_input,
-                                                          decoder_hidden,
-                                                          encoder_output,
-                                                          xs_len,
-                                                          context_vec)
+			decoder_output, decoder_hidden, attn_wts, context_vec = self.decoder(decoder_input,decoder_hidden,encoder_output,xs_len,context_vec)
 
-            _max_score, preds = decoder_output.max(2)
-            predictions.append(preds)
-            decoder_input = preds  # set input to next step
+			_max_score, preds = decoder_output.max(2)
+			predictions.append(preds)
+			decoder_input = preds  # set input to next step
 
-            attn_wts_list.append(attn_wts)
+			attn_wts_list.append(attn_wts)
 
-            # check if we've produced the end token
-            for b in range(bsz):
-                if not done[b]:
-                    # only add more tokens for examples that aren't done
-                    if preds[b].item() == self.END_IDX:
-                        # if we produced END, we're done
-                        done[b] = True
-                        total_done += 1
-            if total_done == bsz:
-                # no need to generate any more
-                break
-        predictions = torch.cat(predictions, 1)
+			# check if we've produced the end token
+			for b in range(bsz):
+				if not done[b]:
+					# only add more tokens for examples that aren't done
+					if preds[b].item() == self.END_IDX:
+						# if we produced END, we're done
+						done[b] = True
+						total_done += 1
+			if total_done == bsz:
+				# no need to generate any more
+				break
+		predictions = torch.cat(predictions, 1)
 
-        if return_attn:
-            return self.v2t(predictions), attn_wts_list
-        return self.v2t(predictions)
+		if return_attn:
+			return self.v2t(predictions), attn_wts_list
+		return self.v2t(predictions)

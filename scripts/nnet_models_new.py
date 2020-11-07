@@ -154,9 +154,9 @@ class Attention_Module(nn.Module):
         att_score = torch.bmm(encoder_outs, x.unsqueeze(-1)); #this is bsz x seq x 1
         att_score = att_score.squeeze(-1); #this is bsz x seq
         att_score = att_score.transpose(0, 1);
-        
-        seq_mask = self.sequence_mask(src_lens, 
-                                    max_len=max(src_lens).item(), 
+
+        seq_mask = self.sequence_mask(src_lens,
+                                    max_len=max(src_lens).item(),
                                     device = hidden.device).transpose(0, 1)
 
 
@@ -195,12 +195,12 @@ class Decoder_SelfAttn(nn.Module):
         self.hidden_size = hidden_size;
         self.embedding = nn.Embedding(output_size, hidden_size);
 
-        self.memory_rnn = nn.GRUCell(hidden_size + int(self.encoder_attention==True)*self.hidden_size, 
+        self.memory_rnn = nn.GRUCell(hidden_size + int(self.encoder_attention==True)*self.hidden_size,
                                     hidden_size, bias=True);
 
         self.out = nn.Linear(hidden_size, output_size)
         self.softmax = nn.LogSoftmax(dim=1)
-        
+
         if self.self_attention:
             self.projector_summ = nn.Sequential(nn.Dropout(idropout),
                                                 nn.Linear(hidden_size*2, hidden_size),
@@ -208,16 +208,16 @@ class Decoder_SelfAttn(nn.Module):
 
         if self.encoder_attention:
             self.encoder_attention_module = Attention_Module(self.hidden_size, self.hidden_size);
-        
+
     def forward(self, input, memory, encoder_output = None, xs_len = None, context_vec = None):
         memory = memory.transpose(0, 1);
         emb = self.embedding(input)
         emb = F.relu(emb)
-        
-        
+
+
         emb = emb.transpose(0, 1);
         return_scores = torch.empty(emb.size(0), emb.size(1), self.output_size).to(input.device)
-        
+
         if context_vec is None and self.encoder_attention:
             context_vec = torch.zeros([emb.size(1), self.hidden_size]).to(emb.device);
 
@@ -228,7 +228,7 @@ class Decoder_SelfAttn(nn.Module):
 
         for t in range(emb.size(0)):
             current_vec = emb[t];
-            
+
             if self.self_attention:
                 selected_memory, attention0 = self.calculate_self_attention(current_vec, memory)
 
@@ -236,13 +236,13 @@ class Decoder_SelfAttn(nn.Module):
                 current_vec = torch.cat([current_vec, context_vec], dim = 1);
                 selected_memory = memory[:, 0, :];
 
-                
-            if ( not (self.self_attention or self.encoder_attention)):    
+
+            if ( not (self.self_attention or self.encoder_attention)):
                 selected_memory, attention0 = memory[:, 0, :], None;
 
             # recurrent
             mem_out = self.memory_rnn(current_vec, selected_memory);
-    
+
             if self.encoder_attention:
                 context_vec, attention0 = self.encoder_attention_module(mem_out, encoder_output, xs_len);
                 scores = self.out(context_vec);
@@ -258,18 +258,18 @@ class Decoder_SelfAttn(nn.Module):
                 memory = torch.cat([mem_out[:, None, :], memory[:, :-1, :]], dim=1);
             else:
                 memory = mem_out[:, None, :];
-            
+
         return return_scores.transpose(0, 1).contiguous(), memory.transpose(0,1), attn_wts_list, context_vec
 
     def calculate_self_attention(self, input, memory):
         # select memory to use
         concat_vec = torch.cat([input,  memory[:, 0, :]], dim=1);
         projected_vec = self.projector_summ(concat_vec);
-    
+
         dot_product_values = torch.bmm(memory, projected_vec.unsqueeze(-1)).squeeze(-1)/ math.sqrt(self.hidden_size);
-        
+
         weights =  F.softmax(dot_product_values, dim = 1).unsqueeze(-1);
-        
+
         selected_memory = torch.sum( memory * weights, dim=1)
         return selected_memory, weights
 
@@ -365,7 +365,7 @@ class seq2seq(nn.Module):
         )
 
     def get_bleu_score(self, val_loader):
-        
+
         bl = bleu_score.BLEU_SCORE();
         predicted_list = []
         real_list = []
@@ -408,7 +408,7 @@ class seq2seq(nn.Module):
         decoder_input = torch.cat([starts, y_in], 1)
 
         decoder_output, decoder_hidden, _, _ = self.decoder(decoder_input,
-                                                      encoder_hidden, 
+                                                      encoder_hidden,
                                                       encoder_output,
                                                       xs_len)
 
@@ -447,7 +447,7 @@ class seq2seq(nn.Module):
         total_done = 0
         decoder_input = starts
         decoder_hidden = encoder_hidden
-        
+
         attn_wts_list = []
         context_vec = None;
 
@@ -456,14 +456,14 @@ class seq2seq(nn.Module):
 
             decoder_output, decoder_hidden, attn_wts, context_vec = self.decoder(decoder_input,
                                                           decoder_hidden,
-                                                          encoder_output, 
-                                                          xs_len, 
+                                                          encoder_output,
+                                                          xs_len,
                                                           context_vec)
 
             _max_score, preds = decoder_output.max(2)
             predictions.append(preds)
             decoder_input = preds  # set input to next step
-            
+
             attn_wts_list.append(attn_wts)
 
             # check if we've produced the end token
@@ -478,7 +478,7 @@ class seq2seq(nn.Module):
                 # no need to generate any more
                 break
         predictions = torch.cat(predictions, 1)
-        
+
         if return_attn:
             return self.v2t(predictions), attn_wts_list
         return self.v2t(predictions)

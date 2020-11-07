@@ -26,7 +26,7 @@ PROJECT=/scratch/${NETID}/nlp_project
 # Set arguments
 STUDY_NAME=nmt_1gpu               # name of experiment
 SAVE_DIR=${PROJECT}/saved_models      # directory for results
-DATA_DIR=${PROJECT}/vietnamese-chatbot/data/interim/iwslt15-en-vn          # directory for data
+DATA_DIR=${PROJECT}/vietnamese-chatbot/data/interim/iwslt15-en-vn/          # directory for data
 BATCH_SIZE=64                           # batch-size, will be split over number of GPUs
 SEED=42                           # seed for experiment, Huggingface default is 42
 SOURCE_NAME='vi'

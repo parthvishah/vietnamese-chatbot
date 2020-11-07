@@ -281,18 +281,16 @@ class seq2seq(nn.Module):
         encoder,
         decoder,
         lr=1e-3,
-        use_cuda=True,
         hiddensize=128,
         numlayers=2,
         target_lang=None,
         longest_label=20,
         clip=0.3,
+		device
     ):
         super(seq2seq, self).__init__()
 
-        device = torch.device(
-            "cuda" if (torch.cuda.is_available() and use_cuda) else "cpu"
-        )
+
         print("Device is {}".format(device))
         self.device = device
         self.encoder = encoder.to(device)

@@ -127,7 +127,8 @@ def main():
 									numlayers = hidden_size,
 									target_lang=dataset_dict['train'].target_lang_obj,
 									longest_label = longest_label,
-									clip = gradient_clip)
+									clip = gradient_clip,
+									device = device)
 
 	train_again = False
 	if os.path.exists(utils.get_full_filepath(saved_models_dir, 'rnn')) and (not train_again):

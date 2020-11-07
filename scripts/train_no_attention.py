@@ -99,7 +99,7 @@ def main():
 	target_vocab = dataset_dict['train'].target_lang_obj.n_words;
 	hidden_size = parser.hidden_size
 	rnn_layers = parser.rnn_layers
-	lr = parser.learning_rate
+	lr = parser.lr
 	longest_label = parser.longest_label
 	gradient_clip = parser.gradient_clip
 	use_cuda = True

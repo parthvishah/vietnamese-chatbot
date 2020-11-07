@@ -114,7 +114,7 @@ def main():
 											hidden_size = hidden_size,
 											numlayers = rnn_layers)
 	# decoder model
-	decoder_rnn = nnet_models_new.DecoderRNN(input_size = target_vocab,
+	decoder_rnn = nnet_models_new.DecoderRNN(output_size = target_vocab,
 												hidden_size = hidden_size,
 												numlayers = rnn_layers)
 

@@ -350,7 +350,7 @@ class seq2seq(nn.Module):
 			return self.target_lang.vec2txt(output_tokens)
 
 		elif vector.dim() == 2:
-return [self.v2t(vector[i]) for i in range(vector.size(0))]
+			return [self.v2t(vector[i]) for i in range(vector.size(0))]
 		raise RuntimeError(
 		"Improper input to v2t with dimensions {}".format(vector.size())
 		)

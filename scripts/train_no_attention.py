@@ -123,7 +123,7 @@ def main():
 									longest_label = longest_label,
 									clip = gradient_clip,
 									device = device)
-	log.info("Seq2Seq Model with the following parameters: hidden_size = {}, rnn_layers = {}, lr = {}, longest_label = {}, gradient_clip = {}, num_epochs = {}, source_name = {}, target_name = {}".format(hidden_size, rnn_layers, lr, longest_label, gradient_clip, num_epochs, source_name, target_name))
+	log.info("Seq2Seq Model with the following parameters: batch_size = {}, hidden_size = {}, rnn_layers = {}, lr = {}, longest_label = {}, gradient_clip = {}, num_epochs = {}, source_name = {}, target_name = {}".format(batchSize, hidden_size, rnn_layers, lr, longest_label, gradient_clip, num_epochs, source_name, target_name))
 
 	train_again = False
 	if os.path.exists(utils.get_full_filepath(saved_models_dir, 'rnn')) and (not train_again):

@@ -47,10 +47,7 @@ def main():
 
 	# set devise to CPU if available
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-	log.info("Device is {}".format(device))
-
 	log.info("Starting experiment {} VN -> EN NMT on {}".format(parser.experiment,device))
-
 
 	# set file paths
 	source_name = parser.source_name
@@ -126,11 +123,13 @@ def main():
 									longest_label = longest_label,
 									clip = gradient_clip,
 									device = device)
+	log.info("Seq2Seq Model with the following parameters: hidden_size = {}, rnn_layers = {}, lr = {}, longest_label = {}, gradient_clip = {}, num_epochs = {}, source_name = {}, target_name = {}".format(hidden_size, rnn_layers, lr, longest_label, gradient_clip, num_epochs, source_name, target_name)
 
 	train_again = False
 	if os.path.exists(utils.get_full_filepath(saved_models_dir, 'rnn')) and (not train_again):
 		nmt_rnn = torch.load(utils.get_full_filepath(saved_models_dir, 'rnn'), map_location=global_variables.device)
 	else:
+		log.info("Starting to train...")
 		utils.train_model(dataloader_dict,
 							nmt_rnn,num_epochs = num_epochs,
 							saved_model_path = saved_models_dir,

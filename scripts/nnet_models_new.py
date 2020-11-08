@@ -289,8 +289,6 @@ class seq2seq(nn.Module):
 				):
 		super(seq2seq, self).__init__()
 
-
-		print("Device is {}".format(device))
 		self.device = device
 		self.encoder = encoder.to(device)
 		self.decoder = decoder.to(device)

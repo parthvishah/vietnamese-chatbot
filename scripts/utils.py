@@ -44,8 +44,6 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
 
 		print("epoch {} loss = {}, time = {}".format(epoch, epoch_loss,
 														time.time() - start))
-		log.info(f"epoch {epoch} | loss {epoch_loss} |time = {time.time() - start}")
-
 
 		sys.stdout.flush()
 
@@ -59,6 +57,7 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
 			if val_bleu_score > best_bleu:
 				best_bleu = val_bleu_score
 				save_models(nmt, saved_model_path, enc_type);
+			log.info(f"epoch {epoch} | loss {epoch_loss} | time = {time.time() - start} | validation bleu = {val_bleu_score}")
 
 		print('='*50)
 

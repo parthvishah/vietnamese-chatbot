@@ -289,6 +289,8 @@ class seq2seq(nn.Module):
 				):
 		super(seq2seq, self).__init__()
 
+
+		print("Device is {}".format(device))
 		self.device = device
 		self.encoder = encoder.to(device)
 		self.decoder = decoder.to(device)
@@ -399,7 +401,6 @@ class seq2seq(nn.Module):
 
 		scores = decoder_output.view(-1, decoder_output.size(-1))
 		loss = self.criterion(scores, ys.view(-1))
-		print('this is the device {}'.format(self.device))
 		loss.backward()
 		self.update_params()
 

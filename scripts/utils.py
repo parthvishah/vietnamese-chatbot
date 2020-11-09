@@ -42,8 +42,7 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
 
 		epoch_loss = running_loss / len(dataloader['train'])
 
-		print("epoch {} loss = {}, time = {}".format(epoch, epoch_loss,
-														time.time() - start))
+		print("epoch {} loss = {}, time = {}".format(epoch, epoch_loss, time.time() - start))
 
 		sys.stdout.flush()
 

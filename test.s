@@ -27,10 +27,9 @@ PROJECT=/scratch/${NETID}/nlp_project
 STUDY_NAME=nmt_1gpu               # name of experiment
 SAVE_DIR=${PROJECT}/saved_models      # directory for results
 DATA_DIR=${PROJECT}/vietnamese-chatbot/data/interim/iwslt15-en-vn/          # directory for data
-BATCH_SIZE=64                           # batch-size, will be split over number of GPUs
-SEED=42                           # seed for experiment, Huggingface default is 42
-SOURCE_NAME='vi'
-TARGET_NAME='en'
+BATCH_SIZE=64                          
+SOURCE_NAME='en'
+TARGET_NAME='vi'
 HIDDEN_SIZE=512
 RNN_LAYERS=1
 LONGEST_LABEL=1
@@ -44,7 +43,6 @@ python ./vietnamese-chatbot/scripts/train_no_attention.py \
 	--save_dir ${SAVE_DIR} \
 	--data_dir ${DATA_DIR} \
 	--batch_size ${BATCH_SIZE} \
-	--seed ${SEED} \
 	--source_name ${SOURCE_NAME} \
 	--target_name ${TARGET_NAME} \
 	--hidden_size ${HIDDEN_SIZE} \

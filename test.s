@@ -24,10 +24,11 @@ source activate nmt_env
 PROJECT=/scratch/${NETID}/nlp_project
 
 # Set arguments
-STUDY_NAME=nmt_1gpu               # name of experiment
-SAVE_DIR=${PROJECT}/saved_models      # directory for results
-DATA_DIR=${PROJECT}/vietnamese-chatbot/data/interim/iwslt15-en-vn/          # directory for data
-BATCH_SIZE=64                          
+STUDY_NAME=nmt_1gpu
+SAVE_DIR=${PROJECT}/saved_models
+DATA_DIR=${PROJECT}/vietnamese-chatbot/data/interim/iwslt15-en-vn/
+BATCH_SIZE=64
+LR=0.25
 SOURCE_NAME='en'
 TARGET_NAME='vi'
 HIDDEN_SIZE=512
@@ -43,6 +44,7 @@ python ./vietnamese-chatbot/scripts/train_no_attention.py \
 	--save_dir ${SAVE_DIR} \
 	--data_dir ${DATA_DIR} \
 	--batch_size ${BATCH_SIZE} \
+	--learning_rate ${LR} \
 	--source_name ${SOURCE_NAME} \
 	--target_name ${TARGET_NAME} \
 	--hidden_size ${HIDDEN_SIZE} \

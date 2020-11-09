@@ -35,6 +35,14 @@ def main():
 	log.basicConfig(filename=log_name, format='%(asctime)s | %(name)s -- %(message)s', level=log.INFO)
 	os.chmod(log_name, parser.access_mode)
 
+	# set seed for replication
+	random.seed(parser.seed)
+	np.random.seed(parser.seed)
+	torch.manual_seed(parser.seed)
+	if torch.cuda.is_available():
+		torch.cuda.manual_seed_all(parser.seed)
+	log.info("The seed is {}".format(parser.seed))
+
 	# set devise to CPU if available
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	log.info("Starting experiment {} VN -> EN NMT on {}".format(parser.experiment,device))
@@ -60,6 +68,7 @@ def main():
 	# get max sentence length bby 99% percentile
 	MAX_LEN = int(dataset_dict['train'].main_df['source_len'].quantile(0.9999))
 	batchSize = parser.batch_size
+	log.info("Batch size = {}.".format(batchSize))
 
 	dataloader_dict = {'train': DataLoader(dataset_dict['train'], batch_size = batchSize, collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=MAX_LEN), shuffle = True, num_workers=0), 'dev': DataLoader(dataset_dict['dev'], batch_size = batchSize, collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=MAX_LEN), shuffle = True, num_workers=0)}
 
@@ -71,7 +80,7 @@ def main():
 	target_vocab = dataset_dict['train'].target_lang_obj.n_words;
 	hidden_size = parser.hidden_size
 	rnn_layers = parser.rnn_layers
-	lr = 0.25
+	lr = parser.lr
 	longest_label = parser.longest_label
 	gradient_clip = parser.gradient_clip
 	num_epochs = parser.epochs
@@ -84,9 +93,12 @@ def main():
 	# seq2seq model
 	nmt_rnn = nnet_models_new.seq2seq(encoder_rnn, decoder_rnn, lr = lr, hiddensize = hidden_size, numlayers = hidden_size, target_lang=dataset_dict['train'].target_lang_obj, longest_label = longest_label, clip = gradient_clip, device = device)
 
-	log.info("Seq2Seq Model with the following parameters: batch_size = {}, hidden_size = {}, rnn_layers = {}, lr = {}, longest_label = {}, gradient_clip = {}, num_epochs = {}, source_name = {}, target_name = {}".format(batchSize, hidden_size, rnn_layers, lr, longest_label, gradient_clip, num_epochs, source_name, target_name))
+	log.info("Seq2Seq Model with the following parameters: batch_size = {}, learning_rate = {}, hidden_size = {}, rnn_layers = {}, lr = {}, longest_label = {}, gradient_clip = {}, num_epochs = {}, source_name = {}, target_name = {}".format(batchSize, lr, hidden_size, rnn_layers, lr, longest_label, gradient_clip, num_epochs, source_name, target_name))
+
+	print("Seq2Seq Model with the following parameters: batch_size = {}, learning_rate = {}, hidden_size = {}, rnn_layers = {}, lr = {}, longest_label = {}, gradient_clip = {}, num_epochs = {}, source_name = {}, target_name = {}".format(batchSize, lr, hidden_size, rnn_layers, lr, longest_label, gradient_clip, num_epochs, source_name, target_name))
 
 	train_again = False
+	print(utils.get_full_filepath(saved_models_dir, 'rnn'))
 	if os.path.exists(utils.get_full_filepath(saved_models_dir, 'rnn')) and (not train_again):
 		nmt_rnn = torch.load(utils.get_full_filepath(saved_models_dir, 'rnn'), map_location=global_variables.device)
 	else:

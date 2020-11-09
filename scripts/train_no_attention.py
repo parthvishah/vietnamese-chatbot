@@ -35,6 +35,12 @@ def main():
 	log.basicConfig(filename=log_name, format='%(asctime)s | %(name)s -- %(message)s', level=log.INFO)
 	os.chmod(log_name, parser.access_mode)
 
+
+
+	# set devise to CPU if available
+	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+	log.info("Starting experiment {} VN -> EN NMT on {}".format(parser.experiment,device))
+
 	# set seed for replication
 	random.seed(parser.seed)
 	np.random.seed(parser.seed)
@@ -42,11 +48,7 @@ def main():
 	if torch.cuda.is_available():
 		torch.cuda.manual_seed_all(parser.seed)
 	log.info("The seed is {}".format(parser.seed))
-
-	# set devise to CPU if available
-	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-	log.info("Starting experiment {} VN -> EN NMT on {}".format(parser.experiment,device))
-
+	
 	# set file paths
 	source_name = parser.source_name
 	target_name = parser.target_name

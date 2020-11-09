@@ -29,6 +29,7 @@ SAVE_DIR=${PROJECT}/saved_models
 DATA_DIR=${PROJECT}/vietnamese-chatbot/data/interim/iwslt15-en-vn/
 BATCH_SIZE=64
 LR=0.25
+SEED=42
 SOURCE_NAME='en'
 TARGET_NAME='vi'
 HIDDEN_SIZE=512
@@ -45,6 +46,7 @@ python ./vietnamese-chatbot/scripts/train_no_attention.py \
 	--data_dir ${DATA_DIR} \
 	--batch_size ${BATCH_SIZE} \
 	--learning_rate ${LR} \
+	--seed ${SEED} \
 	--source_name ${SOURCE_NAME} \
 	--target_name ${TARGET_NAME} \
 	--hidden_size ${HIDDEN_SIZE} \

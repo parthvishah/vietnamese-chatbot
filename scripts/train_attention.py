@@ -88,8 +88,8 @@ def main():
 	longest_label = parser.longest_label
 	gradient_clip = parser.gradient_clip
 	num_epochs = parser.epochs
-	encoder_attention = True
-	self_attention = False
+	encoder_attention = parser.encoder_attention
+	self_attention = parser.self_attention
 
 	# encoder model
 	encoder_encoderattn = nnet_models_new.EncoderRNN(input_size = source_vocab, hidden_size = hidden_size, numlayers = rnn_layers)

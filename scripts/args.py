@@ -83,7 +83,14 @@ args.add_argument('--epochs',
 					type=int,
 					default=10,
 					help='number of epochs')
-
+args.add_argument('--encoder_attention',
+                                        type=bool,
+                                        default=False,
+                                        help='with encoder attention')
+args.add_argument('--self_attention',
+                                        type=bool,
+                                        default=False,
+                                        help='with self-attention')
 
 
 def check_args(parser):

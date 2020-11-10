@@ -7,9 +7,9 @@
 #SBATCH --mem=64000
 #SBATCH --time=48:00:00
 #SBATCH --mail-type=END
-#SBATCH --mail-user=an3056@nyu.edu
+#SBATCH --mail-user=ltk224@nyu.edu
 #SBATCH --job-name="seq2seq_attn_train"
-#SBATCH --output=/scratch/an3056/nlp_project/outputs/%j.out
+#SBATCH --output=/scratch/ltk224/nlp_project/outputs/%j.out
 
 module purge
 module load anaconda3/5.3.1
@@ -17,7 +17,7 @@ module load cuda/10.0.130
 module load gcc/6.3.0
 
 # Replace with your NetID
-NETID=an3056
+NETID=ltk224
 source activate nmt_env
 
 # Set project working directory
@@ -37,6 +37,8 @@ RNN_LAYERS=1
 LONGEST_LABEL=1
 GRADIENT_CLIP=0.3
 EPOCHS=10
+ENCODER_ATTN=TRUE
+SELF_ATTN=TRUE
 
 cd ${PROJECT}
 python ./vietnamese-chatbot/scripts/train_attention.py \
@@ -52,4 +54,6 @@ python ./vietnamese-chatbot/scripts/train_attention.py \
 	--rnn_layers ${RNN_LAYERS} \
 	--longest_label ${LONGEST_LABEL} \
 	--gradient_clip ${GRADIENT_CLIP} \
-	--epochs ${EPOCHS}
+	--epochs ${EPOCHS} \
+	--encoder_attention ${ENCODER_ATTN} \
+	--self_attention ${SELF_ATTN}

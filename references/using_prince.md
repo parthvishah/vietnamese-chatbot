@@ -18,7 +18,8 @@ Setup
 
 4. Create outputs folder and saved_models folder within nlp_project directory
 	* `mkdir saved_models`
-	* `mkdir outputs` 
+	* `mkdir outputs`
+	* `mkdir log`
 
 5. Clone repository within nlp_project directory `git clone https://github.com/anhthyngo/vietnamese-chatbot.git`
 
@@ -34,6 +35,6 @@ Setup
 
 8. Once the environment is created and you are within the root project directory, create copy of `seq2seq_train_1gpu.s` to include your netid in the file name and within the file.
 
-9.  Run job `sbatch seq2seq_train_1_gpu_netid.s`
+9.  Run job `sbatch nmt_no_attention_1gpu_netid.s`
 	* You can check on the job by `squeue -u netid`
 

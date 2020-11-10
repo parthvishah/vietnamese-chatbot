@@ -24,7 +24,7 @@ source activate nmt_env
 PROJECT=/scratch/${NETID}/nlp_project
 
 # Set arguments
-STUDY_NAME=nmt_1gpu
+STUDY_NAME=nmt_64b_0.25lr_1gpu #nmt_batchsize_learningrate_gpus
 SAVE_DIR=${PROJECT}/saved_models
 DATA_DIR=${PROJECT}/vietnamese-chatbot/data/interim/iwslt15-en-vn/
 BATCH_SIZE=64
@@ -37,7 +37,6 @@ RNN_LAYERS=1
 LONGEST_LABEL=1
 GRADIENT_CLIP=0.3
 EPOCHS=10
-
 
 cd ${PROJECT}
 python ./vietnamese-chatbot/scripts/train_no_attention.py \

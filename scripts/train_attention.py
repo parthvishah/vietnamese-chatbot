@@ -107,7 +107,7 @@ def main():
 	modelname = 'encoderattn'
 
 	# check if there is a saved model and if we want to train again
-	if os.path.exists(utils.get_full_filepath(saved_models_dir, modedlname)) and (not train_again):
+	if os.path.exists(utils.get_full_filepath(saved_models_dir, modelname)) and (not train_again):
 		log.info("Retrieving saved model from {}".format(utils.get_full_filepath(saved_models_dir, modelname)))
 		nmt_rnn = torch.load(utils.get_full_filepath(saved_models_dir, modelname))
 	# train model again

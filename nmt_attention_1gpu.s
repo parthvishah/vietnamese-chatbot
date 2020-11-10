@@ -8,7 +8,7 @@
 #SBATCH --time=48:00:00
 #SBATCH --mail-type=END
 #SBATCH --mail-user=an3056@nyu.edu
-#SBATCH --job-name="seq2seq_noattn_train"
+#SBATCH --job-name="seq2seq_attn_train"
 #SBATCH --output=/scratch/an3056/nlp_project/outputs/%j.out
 
 module purge
@@ -24,7 +24,7 @@ source activate nmt_env
 PROJECT=/scratch/${NETID}/nlp_project
 
 # Set arguments
-STUDY_NAME=nmt_noattn_64b_0.25lr_1gpu #nmt_no_attn_batchsize_learningrate_gpus
+STUDY_NAME=nmt_attn_64b_0.25lr_1gpu #nmt_attn_batchsize_learningrate_gpus
 SAVE_DIR=${PROJECT}/saved_models
 DATA_DIR=${PROJECT}/vietnamese-chatbot/data/interim/iwslt15-en-vn/
 BATCH_SIZE=64
@@ -39,7 +39,7 @@ GRADIENT_CLIP=0.3
 EPOCHS=10
 
 cd ${PROJECT}
-python ./vietnamese-chatbot/scripts/train_no_attention.py \
+python ./vietnamese-chatbot/scripts/train_attention.py \
 	--experiment ${STUDY_NAME} \
 	--save_dir ${SAVE_DIR} \
 	--data_dir ${DATA_DIR} \

@@ -30,7 +30,7 @@ def main():
 	check_args(parser)
 
 	# format logging
-	log_name = os.path.join(parser.run_log, '{}_run_log_{}.log'.format(parser.experiment,dt.now().strftime("%Y%m%d_%H%M")))
+	log_name = os.path.join(parser.run_log, '{}_nmt_run_log_{}.log'.format(parser.experiment,dt.now().strftime("%Y%m%d_%H%M")))
 
 	log.basicConfig(filename=log_name, format='%(asctime)s | %(name)s -- %(message)s', level=log.INFO)
 	os.chmod(log_name, parser.access_mode)
@@ -88,29 +88,33 @@ def main():
 	longest_label = parser.longest_label
 	gradient_clip = parser.gradient_clip
 	num_epochs = parser.epochs
+	encoder_attention = True
+	self_attention = False
 
 	# encoder model
-	encoder_rnn = nnet_models_new.EncoderRNN(input_size = source_vocab, hidden_size = hidden_size, numlayers = rnn_layers)
+	encoder_encoderattn = nnet_models_new.EncoderRNN(input_size = source_vocab, hidden_size = hidden_size, numlayers = rnn_layers)
+
 	# decoder model
-	decoder_rnn = nnet_models_new.DecoderRNN(output_size = target_vocab, hidden_size = hidden_size, numlayers = rnn_layers)
+	decoder_encoderattn = nnet_models_new.Decoder_SelfAttn(output_size = target_vocab, hidden_size = hidden_size, encoder_attention = encoder_attention, self_attention = self_attention)
 
 	# seq2seq model
-	nmt_rnn = nnet_models_new.seq2seq(encoder_rnn, decoder_rnn, lr = lr, hiddensize = hidden_size, numlayers = hidden_size, target_lang=dataset_dict['train'].target_lang_obj, longest_label = longest_label, clip = gradient_clip, device = device)
+	nmt_encoderattn = nnet_models_new.seq2seq(encoder_encoderattn, decoder_encoderattn, lr = lr, hiddensize = hidden_size, numlayers = hidden_size, target_lang=dataset_dict['train'].target_lang_obj, longest_label = longest_label, clip = gradient_clip, device = device)
 
-	log.info("Seq2Seq Model with the following parameters: batch_size = {}, learning_rate = {}, hidden_size = {}, rnn_layers = {}, lr = {}, longest_label = {}, gradient_clip = {}, num_epochs = {}, source_name = {}, target_name = {}".format(batchSize, lr, hidden_size, rnn_layers, lr, longest_label, gradient_clip, num_epochs, source_name, target_name))
+	log.info("Seq2Seq Model with the following parameters: encoder_attention = {}, self_attention = {}, batch_size = {}, learning_rate = {}, hidden_size = {}, rnn_layers = {}, lr = {}, longest_label = {}, gradient_clip = {}, num_epochs = {}, source_name = {}, target_name = {}".format(encoder_attention, self_attention, batchSize, lr, hidden_size, rnn_layers, lr, longest_label, gradient_clip, num_epochs, source_name, target_name))
 
 	# do we want to train again?
 	train_again = False
+	modelname = 'encoderattn'
 
 	# check if there is a saved model and if we want to train again
-	if os.path.exists(utils.get_full_filepath(saved_models_dir, 'rnn')) and (not train_again):
-		log.info("Retrieving saved model from {}".format(utils.get_full_filepath(saved_models_dir, 'rnn')))
-		nmt_rnn = torch.load(utils.get_full_filepath(saved_models_dir, 'rnn'), map_location=global_variables.device)
+	if os.path.exists(utils.get_full_filepath(saved_models_dir, modedlname)) and (not train_again):
+		log.info("Retrieving saved model from {}".format(utils.get_full_filepath(saved_models_dir, modelname)))
+		nmt_rnn = torch.load(utils.get_full_filepath(saved_models_dir, modelname))
 	# train model again
 	else:
-		log.info("Check if this path exists: {}".format(utils.get_full_filepath(saved_models_dir, 'rnn')))
+		log.info("Check if this path exists: {}".format(utils.get_full_filepath(saved_models_dir, modelname)))
 		log.info("It does not exist! Starting to train...")
-		utils.train_model(dataloader_dict, nmt_rnn,num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = 'rnn_test')
+		utils.train_model(dataloader_dict, nmt_encoderattn, num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = 'encoderattn_test')
 	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
 
 if __name__ == "__main__":

@@ -91,6 +91,8 @@ def main():
 	encoder_attention = parser.encoder_attention
 	self_attention = parser.self_attention
 
+	log.info("encoder_attention = {}, self_attention = {}".format(encoder_attention, self_attention))
+
 	# encoder model
 	encoder_encoderattn = nnet_models_new.EncoderRNN(input_size = source_vocab, hidden_size = hidden_size, numlayers = rnn_layers)
 

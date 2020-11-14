@@ -31,6 +31,8 @@ def save_models(nmt_model, path, enc_type):
 	filename = 'nmt_enc_'+enc_type+'_dec_rnn.pth'
 	torch.save(nmt_model, os.path.join(path, filename))
 
+
+
 def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = '.', enc_type ='rnn'):
 	'''
 	nmt training loop
@@ -118,9 +120,18 @@ def showAttention(input_sentence, output_words, attentions):
     # Show label at every tick
     ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+	
 
     plt.show()
+    script_dir = os.path.dirname(__file__)
+    results_dir = os.path.join(script_dir, 'plots/')
+    sample_file_name = "sample"
+    if not os.path.isdir(results_dir):
+    	os.makedirs(results_dir)
+    plt.savefig(results_dir + sample_file_name)
 
+	
+	
 def get_encoded_batch(sentence, lang_obj, use_cuda):
     """ accepts only bsz = 1.
         input: one sentence as a string

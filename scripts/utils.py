@@ -13,7 +13,6 @@ from collections import namedtuple
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-%matplotlib inline
 
 def get_full_filepath(path, enc_type):
 	'''

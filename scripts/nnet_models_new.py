@@ -162,7 +162,7 @@ class Attention_Module(nn.Module):
 		x = torch.tanh(self.l2(torch.cat((x, hidden), dim=1)))
 		return x, attn_scores
 
-    def sequence_mask(self, sequence_length, max_len=None, device = torch.device('cuda')):
+	def sequence_mask(self, sequence_length, max_len=None, device = torch.device('cuda')):
 		if max_len is None:
 			max_len = sequence_length.max().item()
 		batch_size = sequence_length.size(0)
@@ -194,7 +194,7 @@ class Decoder_SelfAttn(nn.Module):
 		self.softmax = nn.LogSoftmax(dim=1)
 
 		if self.self_attention:
-		    self.projector_summ = nn.Sequential(nn.Dropout(idropout), nn.Linear(hidden_size*2, hidden_size), nn.Dropout(idropout))
+			self.projector_summ = nn.Sequential(nn.Dropout(idropout), nn.Linear(hidden_size*2, hidden_size), nn.Dropout(idropout))
 
 		if self.encoder_attention:
 			self.encoder_attention_module = Attention_Module(self.hidden_size, self.hidden_size);

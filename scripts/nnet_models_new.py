@@ -92,7 +92,7 @@ class EncoderRNN(nn.Module):
 		hidden_size, hidden_size, num_layers=numlayers, batch_first=True
 		)
 
-    def forward(self, input, hidden=None):
+	def forward(self, input, hidden=None):
 		"""Return encoded state.
 		:param input: (batchsize x seqlen) tensor of token indices.
 		:param hidden: optional past hidden state

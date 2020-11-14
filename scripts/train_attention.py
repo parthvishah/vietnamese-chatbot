@@ -30,7 +30,7 @@ def main():
 	check_args(parser)
 
 	# format logging
-	log_name = os.path.join(parser.run_log, '{}_nmt_run_log_{}.log'.format(parser.experiment,dt.now().strftime("%Y%m%d_%H%M")))
+	log_name = os.path.join(parser.run_log, '{}_run_log_{}.log'.format(parser.experiment,dt.now().strftime("%Y%m%d_%H%M")))
 
 	log.basicConfig(filename=log_name, format='%(asctime)s | %(name)s -- %(message)s', level=log.INFO)
 	os.chmod(log_name, parser.access_mode)

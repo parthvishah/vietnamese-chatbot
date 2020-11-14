@@ -249,7 +249,7 @@ class Decoder_SelfAttn(nn.Module):
 
 		return return_scores.transpose(0, 1).contiguous(), memory.transpose(0,1), attn_wts_list, context_vec
 
-		def calculate_self_attention(self, input, memory):
+	def calculate_self_attention(self, input, memory):
 		# select memory to use
 		concat_vec = torch.cat([input,  memory[:, 0, :]], dim=1);
 		projected_vec = self.projector_summ(concat_vec);
@@ -361,7 +361,7 @@ class seq2seq(nn.Module):
 		:param batch: parlai.core.torch_agent.Batch, contains tensorized version of observations.
 		Return estimated responses, with teacher forcing on the input sequence
 		(list of strings of length batchsize).
-        """
+		"""
 		xs, xs_len, ys = batch.text_vecs, batch.text_lens, batch.label_vecs
 
 		if xs is None:

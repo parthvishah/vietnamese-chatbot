@@ -113,9 +113,9 @@ def main():
 		utils.train_model(dataloader_dict, nmt_rnn,num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = 'rnn_test')
 	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
 	
-	rnn_len_threshold, rnn_bin_bl = get_binned_bl_score(nmt_rnn, dataset_dict['val'])
+	rnn_len_threshold, rnn_bin_bl = utils.get_binned_bl_score(nmt_rnn, dataset_dict['val'])
 	#for i in range(10):
-	get_translation(nmt_rnn, 'are hello ? how you', source_lang_obj, use_cuda)
+	utils.get_translation(nmt_rnn, 'are hello ? how you', source_lang_obj, use_cuda)
 	
 if __name__ == "__main__":
     main()

@@ -73,36 +73,33 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
 
 def get_binned_bl_score(nmt_model, val_dataset):
     
-#     source_len = np.sort(np.array(val_dataset.main_df['source_len']))
-#     len_threshold = [0]+[source_len[x*1000+376] for x in range(1, 21)];
-#     len_threshold = np.unique(len_threshold)
-    len_threshold = np.arange(0, 31, 5)
-    bin_bl_score = np.zeros(len(len_threshold));
+	len_threshold = np.arange(0, 31, 5)
+	bin_bl_score = np.zeros(len(len_threshold));
     
-    for i in range(1, len(len_threshold)):
-        min_len = len_threshold[i-1]
-#         min_len = 0
-        max_len = len_threshold[i]
+	for i in range(1, len(len_threshold)):
+        	min_len = len_threshold[i-1]
+#         	min_len = 0
+        	max_len = len_threshold[i]
         
-        temp_dataset = copy.deepcopy(val_dataset);
-        temp_dataset.main_df = temp_dataset.main_df[(temp_dataset.main_df['source_len'] > min_len) & (temp_dataset.main_df['source_len'] <= max_len)];
-        temp_loader = DataLoader(temp_dataset, batch_size = batchSize, 
+        	temp_dataset = copy.deepcopy(val_dataset);
+        	temp_dataset.main_df = temp_dataset.main_df[(temp_dataset.main_df['source_len'] > min_len) & (temp_dataset.main_df['source_len'] <= max_len)];
+        	temp_loader = DataLoader(temp_dataset, batch_size = batchSize, 
                             collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=100),
                             shuffle = True, num_workers=0)
         
-        bin_bl_score[i] = nmt_model.get_bleu_score(temp_loader);
+        	bin_bl_score[i] = nmt_model.get_bleu_score(temp_loader);
         
     
-    len_threshold = len_threshold[1:]
-    bin_bl_score = bin_bl_score[1:]
+	len_threshold = len_threshold[1:]
+	bin_bl_score = bin_bl_score[1:]
     
-    plt.plot(len_threshold, bin_bl_score, 'x-')
-    plt.ylim(0, np.max(bin_bl_score)+1)
-    plt.xlabel('len')
-    plt.ylabel('bl score')
+	plt.plot(len_threshold, bin_bl_score, 'x-')
+	plt.ylim(0, np.max(bin_bl_score)+1)
+	plt.xlabel('len')
+	plt.ylabel('bl score')
     
-    return len_threshold, bin_bl_score
-    
+	return len_threshold, bin_bl_score
+
 def showAttention(input_sentence, output_words, attentions):
     # Set up figure with colorbar
     fig = plt.figure()

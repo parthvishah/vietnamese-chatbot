@@ -117,7 +117,7 @@ def main():
 	log.info("rnn_len_threshold: {}".format(rnn_len_threshold))
 
 	#for i in range(10):
-	utils.get_translation(nmt_rnn, 'are hello ? how you', source_lang_obj, use_cuda)
+	log.info("{}".format(utils.get_translation(nmt_rnn, 'are hello ? how you', source_lang_obj, use_cuda)))
 	
 if __name__ == "__main__":
     main()

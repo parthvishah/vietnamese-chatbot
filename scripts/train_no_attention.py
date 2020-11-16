@@ -113,6 +113,7 @@ def main():
 		utils.train_model(dataloader_dict, nmt_rnn,num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = 'rnn_test')
 	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
 	
+	log.info("Starting binning....")
 	rnn_len_threshold, rnn_bin_bl = utils.get_binned_bl_score(nmt_rnn, dataset_dict['dev'])
 	log.info("rnn_len_threshold: {}".format(rnn_len_threshold))
 

@@ -114,6 +114,8 @@ def main():
 	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
 	
 	rnn_len_threshold, rnn_bin_bl = utils.get_binned_bl_score(nmt_rnn, dataset_dict['dev'])
+	log.info("rnn_len_threshold: {}".format(rnn_len_threshold))
+
 	#for i in range(10):
 	utils.get_translation(nmt_rnn, 'are hello ? how you', source_lang_obj, use_cuda)
 	

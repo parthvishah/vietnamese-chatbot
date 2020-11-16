@@ -79,7 +79,7 @@ def get_binned_bl_score(nmt_model, val_dataset):
     len_threshold = np.arange(0, 31, 5)
     bin_bl_score = np.zeros(len(len_threshold));
     
-    for i in range(1, len(len_threshold), total = len(len_threshold)-1):
+    for i in range(1, len(len_threshold)):
         min_len = len_threshold[i-1]
 #         min_len = 0
         max_len = len_threshold[i]

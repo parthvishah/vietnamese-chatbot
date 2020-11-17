@@ -19,6 +19,10 @@ args.add_argument('--save_dir',
                   type=str,
                   default='results',
                   help='directory to save results')
+args.add_argument('--plots_dir',
+                  type=str,
+                  default='plot',
+                  help='directory to save results')
 args.add_argument('--seed',
                   type=int,
                   default=42,
@@ -84,10 +88,10 @@ args.add_argument('--epochs',
 					default=10,
 					help='number of epochs')
 args.add_argument('--encoder_attention',
-					action='store_true',
+					action='store_false',
 					help='with encoder attention')
 args.add_argument('--self_attention',
-					action='store_false',
+					action='store_true',
 					help='with self-attention')
 
 

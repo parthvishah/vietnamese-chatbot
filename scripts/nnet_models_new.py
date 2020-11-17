@@ -452,3 +452,54 @@ class seq2seq(nn.Module):
 		if return_attn:
 			return self.v2t(predictions), attn_wts_list
 		return self.v2t(predictions)
+
+
+class PositionalEncoding(nn.Module):
+
+	def __init__(self, d_hid, n_position=200):
+		super(PositionalEncoding, self).__init__()
+		self.register_buffer('pos_table', self._get_sinusoid_encoding_table(n_position, d_hid))
+
+		def _get_sinusoid_encoding_table(self, n_position, d_hid):
+        ''' Sinusoid position encoding table '''
+
+			def get_position_angle_vec(position):
+				return [position / np.power(10000, 2 * (hid_j // 2) / d_hid) for hid_j in range(d_hid)]
+
+		sinusoid_table = np.array([get_position_angle_vec(pos_i) for pos_i in range(n_position)])
+		sinusoid_table[:, 0::2] = np.sin(sinusoid_table[:, 0::2])  # dim 2i
+		sinusoid_table[:, 1::2] = np.cos(sinusoid_table[:, 1::2])  # dim 2i+1
+
+		return torch.FloatTensor(sinusoid_table).unsqueeze(0)
+
+	def forward(self, x):
+		pos = self.pos_table[:, :x.size(1)].clone().detach()
+		#print(pos.shape)
+		return x + pos
+
+class EncoderTransformer(nn.Module):
+	def __init__(self,vocab_size, max_len, dim=512, num_layers=1, nhead=2):
+		super(EncoderTransformer, self).__init__()
+
+		# you need to add more things here
+		self.num_layers = num_layers
+		self.dim = dim
+
+		self.token_embed = nn.Embedding(vocab_size, dim)
+
+		self.position_embed = PositionalEncoding(dim,max_len)# sinusoidal embedding
+		#encoder_layer = nn.TransformerEncoderLayer()
+		#self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=1)
+
+		encoder_layer = nn.TransformerEncoderLayer(d_model=dim, nhead=nhead, dim_feedforward=512, dropout=0.)
+		self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
+
+	def forward(self, text_vec):
+		# some helpful directions below, check the MLM lab for more details
+		#print(text_vec.shape)
+		batch_size = text_vec.shape[0]
+		x = self.token_embed(text_vec)
+		x = self.position_embed(x)
+		x = x.transpose(0,1)
+		output = self.transformer(x)
+		return torch.transpose(output,0,1), torch.unsqueeze(output[-1],0)

@@ -114,6 +114,8 @@ def main():
 	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
 	
 	log.info("Starting binning....")
+	log.info('Dataset dict {}'.format(dataset_dict['dev'][0]))
+	log.info('nmnt rnn {}'.format(nmt_rnn))
 	rnn_len_threshold, rnn_bin_bl = utils.get_binned_bl_score(nmt_rnn, dataset_dict['dev'])
 	log.info("rnn_len_threshold: {}".format(rnn_len_threshold))
 

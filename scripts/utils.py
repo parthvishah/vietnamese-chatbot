@@ -78,7 +78,7 @@ def get_binned_bl_score(nmt_model, val_dataset):
     
 	for i in range(1, len(len_threshold)):
 		log.info('entered for loop')
-        min_len = len_threshold[i-1]
+		min_len = len_threshold[i-1]
 #         	min_len = 0
 		max_len = len_threshold[i]
 		log.info('entering deepcopy')

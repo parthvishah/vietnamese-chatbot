@@ -161,3 +161,5 @@ def get_translation(nmt_model, sentence, lang_obj, use_cuda):
             attn_matrix = [x[0].data.cpu().numpy() for x in attn_scores_list];
             attn_matrix = np.stack(attn_matrix)[:,:, 0]
             showAttention(sentence, prediction, attn_matrix)
+
+	

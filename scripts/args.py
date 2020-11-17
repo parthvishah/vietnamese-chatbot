@@ -87,7 +87,7 @@ args.add_argument('--encoder_attention',
 					action='store_true',
 					help='with encoder attention')
 args.add_argument('--self_attention',
-					action='store_true',
+					action='store_false',
 					help='with self-attention')
 
 

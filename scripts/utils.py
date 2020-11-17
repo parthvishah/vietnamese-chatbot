@@ -11,6 +11,8 @@ import copy
 import numpy as np
 from collections import namedtuple
 import global_variables
+from args import args, check_args
+
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -73,6 +75,7 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
 
 
 def get_binned_bl_score(nmt_model, val_dataset, batchSize, nmt_dataset):
+    parser = args.parse_args()
     len_threshold = np.arange(0, 31, 5)
     bin_bl_score = np.zeros(len(len_threshold))
     
@@ -106,6 +109,7 @@ def get_binned_bl_score(nmt_model, val_dataset, batchSize, nmt_dataset):
     return len_threshold, bin_bl_score
 
 def showAttention(input_sentence, output_words, attentions):
+    parser = args.parse_args()
     # Set up figure with colorbar
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -123,7 +127,7 @@ def showAttention(input_sentence, output_words, attentions):
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
     plt.show()
     script_dir = parser.save_plots
-	saved_models_dir = os.path.join(script_dir, 'attention')
+    saved_models_dir = os.path.join(script_dir, 'attention')
     if not os.path.isdir(saved_models_dir):
         os.makedirs(saved_models_dir)
     plt.savefig(results_dir)

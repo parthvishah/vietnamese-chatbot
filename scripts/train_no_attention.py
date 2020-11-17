@@ -88,6 +88,7 @@ def main():
 	longest_label = parser.longest_label
 	gradient_clip = parser.gradient_clip
 	num_epochs = parser.epochs
+	use_cuda = True
 
 	# encoder model
 	encoder_rnn = nnet_models_new.EncoderRNN(input_size = source_vocab, hidden_size = hidden_size, numlayers = rnn_layers)

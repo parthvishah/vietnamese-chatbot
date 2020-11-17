@@ -78,19 +78,19 @@ def get_binned_bl_score(nmt_model, val_dataset):
     
 	for i in range(1, len(len_threshold)):
 		log.info('entered for loop')
-        	min_len = len_threshold[i-1]
+        min_len = len_threshold[i-1]
 #         	min_len = 0
-        	max_len = len_threshold[i]
-        	log.info('entering deepcopy')
-        	temp_dataset = copy.deepcopy(val_dataset)
-        	temp_dataset.main_df = temp_dataset.main_df[(temp_dataset.main_df['source_len'] > min_len) & (temp_dataset.main_df['source_len'] <= max_len)]
+		max_len = len_threshold[i]
+		log.info('entering deepcopy')
+		temp_dataset = copy.deepcopy(val_dataset)
+		temp_dataset.main_df = temp_dataset.main_df[(temp_dataset.main_df['source_len'] > min_len) & (temp_dataset.main_df['source_len'] <= max_len)]
 		log.info('entering dataloader in func')
-        	temp_loader = DataLoader(temp_dataset, batch_size = batchSize, 
-                            collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=100),
-                            shuffle = True, num_workers=0)
-        	log.info('get_bleu_score')
-        	bin_bl_score[i] = nmt_model.get_bleu_score(temp_loader)
-        
+		temp_loader = DataLoader(temp_dataset, batch_size = batchSize, 
+						collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=100),
+						shuffle = True, num_workers=0)
+		log.info('get_bleu_score')
+		bin_bl_score[i] = nmt_model.get_bleu_score(temp_loader)
+	
     
 	len_threshold = len_threshold[1:]
 	bin_bl_score = bin_bl_score[1:]
@@ -135,10 +135,10 @@ def get_encoded_batch(sentence, lang_obj, use_cuda):
         input: one sentence as a string
         output: named tuple with vector and length"""
     
-    sentence = sentence + ' ' + global_variables.EOS_TOKEN;
-    tensor = source_lang_obj.txt2vec(sentence).unsqueeze(0)
+	sentence = sentence + ' ' + global_variables.EOS_TOKEN;
+	tensor = source_lang_obj.txt2vec(sentence).unsqueeze(0)
     
-    device = torch.device('cuda') if use_cuda and torch.cuda.is_available() else torch.device('cpu');
+	device = torch.device('cuda') if use_cuda and torch.cuda.is_available() else torch.device('cpu');
     
     named_returntuple = namedtuple('namedtuple', ['text_vecs', 'text_lens', 'label_vecs', 'label_lens', 'use_packed'])
     return_tuple = named_returntuple( tensor.to(device), 
@@ -161,5 +161,3 @@ def get_translation(nmt_model, sentence, lang_obj, use_cuda):
             attn_matrix = [x[0].data.cpu().numpy() for x in attn_scores_list];
             attn_matrix = np.stack(attn_matrix)[:,:, 0]
             showAttention(sentence, prediction, attn_matrix)
-
-	

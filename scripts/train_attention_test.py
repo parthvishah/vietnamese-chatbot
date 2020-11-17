@@ -35,8 +35,6 @@ def main():
 	log.basicConfig(filename=log_name, format='%(asctime)s | %(name)s -- %(message)s', level=log.INFO)
 	os.chmod(log_name, parser.access_mode)
 
-
-
 	# set devise to CPU if available
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	log.info("Starting experiment {} VN -> EN NMT on {}.".format(parser.experiment,device))
@@ -94,7 +92,7 @@ def main():
 	log.info("encoder_attention = {}, self_attention = {}".format(encoder_attention, self_attention))
 
 	# encoder model
-	encoder_transformer = EncoderTransformer(source_vocab, MAX_LEN, hidden_size, rnn_layers)
+	encoder_transformer = nnet_models_new.EncoderTransformer(source_vocab, MAX_LEN, hidden_size, rnn_layers)
 
 	# decoder model
 	decoder_encoderattn = nnet_models_new.Decoder_SelfAttn(output_size=target_vocab, hidden_size=hidden_size, encoder_attention = encoder_attention, self_attention = self_attention)

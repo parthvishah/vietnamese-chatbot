@@ -118,8 +118,6 @@ def showAttention(input_sentence, output_words, attentions):
     # Show label at every tick
     ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-	
-
     plt.show()
     script_dir = os.path.dirname(__file__)
     results_dir = os.path.join(script_dir, 'plots/')
@@ -135,29 +133,29 @@ def get_encoded_batch(sentence, lang_obj, use_cuda):
         input: one sentence as a string
         output: named tuple with vector and length"""
     
-	sentence = sentence + ' ' + global_variables.EOS_TOKEN;
+	sentence = sentence + ' ' + global_variables.EOS_TOKEN
 	tensor = source_lang_obj.txt2vec(sentence).unsqueeze(0)
     
-	device = torch.device('cuda') if use_cuda and torch.cuda.is_available() else torch.device('cpu');
+	device = torch.device('cuda') if use_cuda and torch.cuda.is_available() else torch.device('cpu')
     
-    named_returntuple = namedtuple('namedtuple', ['text_vecs', 'text_lens', 'label_vecs', 'label_lens', 'use_packed'])
-    return_tuple = named_returntuple( tensor.to(device), 
+	named_returntuple = namedtuple('namedtuple', ['text_vecs', 'text_lens', 'label_vecs', 'label_lens', 'use_packed'])
+	return_tuple = named_returntuple( tensor.to(device), 
                                      torch.from_numpy(np.array([tensor.shape[-1]])).to(device),
                                      None,
                                      None,
-                                     False );
+                                     False )
 
     return return_tuple
 
 def get_translation(nmt_model, sentence, lang_obj, use_cuda):
     print('souce: ', sentence)
-    batch = get_encoded_batch(sentence, lang_obj, use_cuda);
-    prediction, attn_scores_list = nmt_model.eval_step(batch, return_attn = True);
-    prediction = prediction[0];
+    batch = get_encoded_batch(sentence, lang_obj, use_cuda)
+    prediction, attn_scores_list = nmt_model.eval_step(batch, return_attn = True)
+    prediction = prediction[0]
     print('prediction: ', prediction)
     
     if attn_scores_list[0] is not None:
         if attn_scores_list[0][0] is not None:
-            attn_matrix = [x[0].data.cpu().numpy() for x in attn_scores_list];
+            attn_matrix = [x[0].data.cpu().numpy() for x in attn_scores_list]
             attn_matrix = np.stack(attn_matrix)[:,:, 0]
             showAttention(sentence, prediction, attn_matrix)

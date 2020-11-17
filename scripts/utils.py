@@ -98,7 +98,7 @@ def get_binned_bl_score(nmt_model, val_dataset, batchSize, nmt_dataset):
     plt.xlabel('len')
     plt.ylabel('bl score')
     script_dir = parser.save_plots
-	saved_models_dir = os.path.join(script_dir, 'binnedplot')
+    saved_models_dir = os.path.join(script_dir, 'binnedplot')
     if not os.path.isdir(saved_models_dir):
         os.makedirs(saved_models_dir)
     plt.savefig(results_dir)

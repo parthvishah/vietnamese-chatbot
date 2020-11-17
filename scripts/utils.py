@@ -72,7 +72,7 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
     print("Training completed. Best BLEU is {}".format(best_bleu))
 
 
-def get_binned_bl_score(nmt_model, val_dataset, batchSize):
+def get_binned_bl_score(nmt_model, val_dataset, batchSize, nmt_dataset):
     log.info('entered binning')
     len_threshold = np.arange(0, 31, 5)
     bin_bl_score = np.zeros(len(len_threshold))

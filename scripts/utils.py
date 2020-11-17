@@ -10,6 +10,7 @@ import time
 import copy
 import numpy as np
 from collections import namedtuple
+import global_variables
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -42,10 +43,10 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
 		start = time.time()
 		running_loss = 0
 
-		print('Epoch: [{}/{}]'.format(epoch, num_epochs));
+		print('Epoch: [{}/{}]'.format(epoch, num_epochs))
 
 		for i, data in enumerate(dataloader['train']):
-			_, curr_loss = nmt.train_step(data);
+			_, curr_loss = nmt.train_step(data)
 			running_loss += curr_loss
 
 		epoch_loss = running_loss / len(dataloader['train'])
@@ -55,15 +56,15 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
 		sys.stdout.flush()
 
 		if epoch%val_every == 0:
-			val_bleu_score = nmt.get_bleu_score(dataloader['dev']);
+			val_bleu_score = nmt.get_bleu_score(dataloader['dev'])
 			print('validation bleu: ', val_bleu_score)
 			sys.stdout.flush()
 
-			nmt.scheduler_step(val_bleu_score);
+			nmt.scheduler_step(val_bleu_score)
 
 			if val_bleu_score > best_bleu:
 				best_bleu = val_bleu_score
-				save_models(nmt, saved_model_path, enc_type);
+				save_models(nmt, saved_model_path, enc_type)
 			log.info(f"epoch {epoch} | loss {epoch_loss} | time = {time.time() - start} | validation bleu = {val_bleu_score}")
 
 		print('='*50)
@@ -74,7 +75,7 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
 def get_binned_bl_score(nmt_model, val_dataset):
 	log.info('entered binning')
 	len_threshold = np.arange(0, 31, 5)
-	bin_bl_score = np.zeros(len(len_threshold));
+	bin_bl_score = np.zeros(len(len_threshold))
     
 	for i in range(1, len(len_threshold)):
 		log.info('entered for loop')
@@ -113,7 +114,7 @@ def showAttention(input_sentence, output_words, attentions):
     ax.set_xticklabels([''] + input_sentence.split(' ') +
                        [global_variables.EOS_TOKEN], rotation=90)
     ax.set_yticklabels([''] + output_words.split(' ')+
-                       [global_variables.EOS_TOKEN]);
+                       [global_variables.EOS_TOKEN])
 
     # Show label at every tick
     ax.xaxis.set_major_locator(ticker.MultipleLocator(1))

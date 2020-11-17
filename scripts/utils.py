@@ -73,7 +73,6 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
 
 
 def get_binned_bl_score(nmt_model, val_dataset, batchSize, nmt_dataset):
-    log.info('entered binning')
     len_threshold = np.arange(0, 31, 5)
     bin_bl_score = np.zeros(len(len_threshold))
     
@@ -82,10 +81,8 @@ def get_binned_bl_score(nmt_model, val_dataset, batchSize, nmt_dataset):
         min_len = len_threshold[i-1]
 #         	min_len = 0
         max_len = len_threshold[i]
-        log.info('entering deepcopy')
         temp_dataset = copy.deepcopy(val_dataset)
         temp_dataset.main_df = temp_dataset.main_df[(temp_dataset.main_df['source_len'] > min_len) & (temp_dataset.main_df['source_len'] <= max_len)]
-        log.info('entering dataloader in func')
         temp_loader = DataLoader(temp_dataset, batch_size = batchSize, 
                         collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=100),
                         shuffle = True, num_workers=0)
@@ -100,6 +97,11 @@ def get_binned_bl_score(nmt_model, val_dataset, batchSize, nmt_dataset):
     plt.ylim(0, np.max(bin_bl_score)+1)
     plt.xlabel('len')
     plt.ylabel('bl score')
+    script_dir = parser.save_plots
+	saved_models_dir = os.path.join(script_dir, 'binnedplot')
+    if not os.path.isdir(saved_models_dir):
+        os.makedirs(saved_models_dir)
+    plt.savefig(results_dir)
     
     return len_threshold, bin_bl_score
 
@@ -120,12 +122,11 @@ def showAttention(input_sentence, output_words, attentions):
     ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
     plt.show()
-    script_dir = os.path.dirname(__file__)
-    results_dir = os.path.join(script_dir, 'plots/')
-    sample_file_name = "sample"
-    if not os.path.isdir(results_dir):
-        os.makedirs(results_dir)
-    plt.savefig(results_dir + sample_file_name)
+    script_dir = parser.save_plots
+	saved_models_dir = os.path.join(script_dir, 'attention')
+    if not os.path.isdir(saved_models_dir):
+        os.makedirs(saved_models_dir)
+    plt.savefig(results_dir)
 
     
     

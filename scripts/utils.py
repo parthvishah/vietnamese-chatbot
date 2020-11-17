@@ -72,7 +72,7 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
     print("Training completed. Best BLEU is {}".format(best_bleu))
 
 
-def get_binned_bl_score(nmt_model, val_dataset):
+def get_binned_bl_score(nmt_model, val_dataset, batchSize):
     log.info('entered binning')
     len_threshold = np.arange(0, 31, 5)
     bin_bl_score = np.zeros(len(len_threshold))
@@ -86,7 +86,6 @@ def get_binned_bl_score(nmt_model, val_dataset):
         temp_dataset = copy.deepcopy(val_dataset)
         temp_dataset.main_df = temp_dataset.main_df[(temp_dataset.main_df['source_len'] > min_len) & (temp_dataset.main_df['source_len'] <= max_len)]
         log.info('entering dataloader in func')
-        batchSize = parser.batch_size
         temp_loader = DataLoader(temp_dataset, batch_size = batchSize, 
                         collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=100),
                         shuffle = True, num_workers=0)

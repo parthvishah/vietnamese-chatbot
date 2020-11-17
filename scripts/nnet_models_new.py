@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import global_variables
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+import numpy as np
 import math
 
 import bleu_score

@@ -134,7 +134,7 @@ def get_encoded_batch(sentence, lang_obj, use_cuda):
         input: one sentence as a string
         output: named tuple with vector and length"""
     
-	sentence = sentence + ' ' + global_variables.EOS_TOKEN
+	sentence = sentence+'	'+global_variables.EOS_TOKEN
 	tensor = source_lang_obj.txt2vec(sentence).unsqueeze(0)
     
 	device = torch.device('cuda') if use_cuda and torch.cuda.is_available() else torch.device('cpu')

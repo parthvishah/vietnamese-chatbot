@@ -84,12 +84,10 @@ args.add_argument('--epochs',
 					default=10,
 					help='number of epochs')
 args.add_argument('--encoder_attention',
-					type=bool,
-					default=False,
+					action='store_true',
 					help='with encoder attention')
 args.add_argument('--self_attention',
-					type=bool,
-					default=False,
+					action='store_true',
 					help='with self-attention')
 
 

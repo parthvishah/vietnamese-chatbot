@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from googletrans import Translator
 
+import global_variables
 
 def get_full_filepath(path, enc_type):
 	'''

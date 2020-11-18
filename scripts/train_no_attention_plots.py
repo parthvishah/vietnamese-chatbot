@@ -116,6 +116,7 @@ def main():
 	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
 	log.info("We will save the models in this directory: {}".format(saved_models_dir))
 	# generate translations
+	use_cuda = True
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'On March 14 , this year , I posted this poster on Facebook .', source_lang_obj, use_cuda)))
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'This is an image of me and my daughter holding the Israeli flag .', source_lang_obj, use_cuda)))
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'I will try to explain to you about the context of why and when I posted .', source_lang_obj, use_cuda)))

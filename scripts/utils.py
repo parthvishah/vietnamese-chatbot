@@ -73,7 +73,7 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
 
 	print("Training completed. Best BLEU is {}".format(best_bleu))
 
-def get_binned_bl_score(nmt_model, val_dataset, location):
+def get_binned_bl_score(nmt_model, val_dataset, location, batchSize):
 
 	len_threshold = np.arange(0, 31, 5)
 	bin_bl_score = np.zeros(len(len_threshold));
@@ -135,14 +135,16 @@ def get_encoded_batch(sentence, lang_obj, use_cuda):
 
 	return return_tuple
 
-def get_translation(nmt_model, sentence, lang_obj, use_cuda):
+def get_translation(nmt_model, sentence, lang_obj, use_cuda, source_name = 'en', target_name = 'vi'):
+	#from googletrans import Translator
+	#translator = Translator()
 	print('source: ', sentence)
 	batch = get_encoded_batch(sentence, lang_obj, use_cuda);
 	prediction, attn_scores_list = nmt_model.eval_step(batch, return_attn = True);
 	prediction = prediction[0];
 	print('prediction: ', prediction)
-	print('GT on sentence (src->tgt): ', translator.translate(sentence, src = source_name, dest = target_name).text)
-	print('GT on prediction (tgt->src): ', translator.translate(prediction, src = target_name, dest = source_name).text)
+	#print('GT on sentence (src->tgt): ', translator.translate(sentence, src = source_name, dest = target_name).text)
+	#print('GT on prediction (tgt->src): ', translator.translate(prediction, src = target_name, dest = source_name).text)
 
 	if attn_scores_list[0] is not None:
 		if attn_scores_list[0][0] is not None:

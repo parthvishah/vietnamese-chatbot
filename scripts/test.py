@@ -13,6 +13,7 @@ from datetime import datetime as dt
 import time
 import random
 import numpy as np
+from googletrans import Translator
 
 # =============== Self Defined ===============
 import global_variables
@@ -107,12 +108,12 @@ def main():
 	# generate translations
 	use_cuda = True
 	translator = Translator()
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'On March 14 , this year , I posted this poster on Facebook .', source_lang_obj, use_cuda)))
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'This is an image of me and my daughter holding the Israeli flag .', source_lang_obj, use_cuda)))
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'I will try to explain to you about the context of why and when I posted .', source_lang_obj, use_cuda)))
+	log.info("{}".format(utils.get_translation(nmt_rnn, 'On March 14 , this year , I posted this poster on Facebook .', source_lang_obj, use_cuda, source_name, target_name)))
+	log.info("{}".format(utils.get_translation(nmt_rnn, 'I love to watch science movies on Mondays', source_lang_obj, use_cuda, source_name, target_name)))
+	log.info("{}".format(utils.get_translation(nmt_rnn, 'I want to be the best friend that I can be', source_lang_obj, use_cuda, source_name, target_name)))
 
 	log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
-	_, _, fig = utils.get_binned_bl_score(nmt_rnn, dataset_dict['val'], plots_dir)
+	_, _, fig = utils.get_binned_bl_score(nmt_rnn, dataset_dict['dev'], plots_dir, batchSize = batchSize)
 
 if __name__ == "__main__":
     main()

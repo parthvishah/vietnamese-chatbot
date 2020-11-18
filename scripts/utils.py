@@ -108,7 +108,6 @@ def get_binned_bl_score(nmt_model, val_dataset, batchSize, nmt_dataset, save_plo
     return len_threshold, bin_bl_score
 
 def showAttention(input_sentence, output_words, attentions, save_plots):
-    parser = args.parse_args()
     # Set up figure with colorbar
     fig = plt.figure()
     ax = fig.add_subplot(111)

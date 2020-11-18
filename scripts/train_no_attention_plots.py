@@ -114,7 +114,7 @@ def main():
 		log.info("It does not exist! Starting to train...")
 		utils.train_model(dataloader_dict, nmt_rnn,num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = 'rnn_test')
 	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
-log.info("We will save the models in this directory: {}".format(saved_models_dir))
+	log.info("We will save the models in this directory: {}".format(saved_models_dir))
 	# generate translations
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'On March 14 , this year , I posted this poster on Facebook .', source_lang_obj, use_cuda)))
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'This is an image of me and my daughter holding the Israeli flag .', source_lang_obj, use_cuda)))

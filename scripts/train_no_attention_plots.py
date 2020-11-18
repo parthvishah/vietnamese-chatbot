@@ -56,8 +56,10 @@ def main():
 	# get saved models dir
 	base_saved_models_dir = parser.save_dir
 	saved_models_dir = os.path.join(base_saved_models_dir, source_name+'2'+target_name)
+	plots_dir = parser.plots_dir
 
 	log.info("We will save the models in this directory: {}".format(saved_models_dir))
+	log.info("We will save the plots in this directory: {}".format(plots_dir))
 
 	# get data dir
 	main_data_path = parser.data_dir
@@ -112,14 +114,14 @@ def main():
 		log.info("It does not exist! Starting to train...")
 		utils.train_model(dataloader_dict, nmt_rnn,num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = 'rnn_test')
 	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
-
+log.info("We will save the models in this directory: {}".format(saved_models_dir))
 	# generate translations
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'On March 14 , this year , I posted this poster on Facebook .', source_lang_obj, use_cuda)))
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'This is an image of me and my daughter holding the Israeli flag .', source_lang_obj, use_cuda)))
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'I will try to explain to you about the context of why and when I posted .', source_lang_obj, use_cuda)))
 
-	log.info("Exported Binned Bleu Score Plot to {}!".format(parser.plot_dir))
-	_, _, fig = utils.get_binned_bl_score(nmt_rnn, dataset_dict['val'], parser.plot_dir)
+	log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
+	_, _, fig = utils.get_binned_bl_score(nmt_rnn, dataset_dict['val'], plots_dir)
 
 if __name__ == "__main__":
     main()

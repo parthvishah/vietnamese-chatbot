@@ -52,6 +52,7 @@ def main():
 	# set file paths
 	source_name = parser.source_name
 	target_name = parser.target_name
+	save_plots = parser.save_plots
 
 	# get saved models dir
 	base_saved_models_dir = parser.save_dir
@@ -117,11 +118,11 @@ def main():
 	log.info("Starting binning....")
 	log.info('Dataset dict {}'.format(dataset_dict['dev'][0]))
 	log.info('nmnt rnn {}'.format(nmt_rnn))
-	rnn_len_threshold, rnn_bin_bl = utils.get_binned_bl_score(nmt_rnn, dataset_dict['dev'],batchSize, nmt_dataset)
+	rnn_len_threshold, rnn_bin_bl = utils.get_binned_bl_score(nmt_rnn, dataset_dict['dev'],batchSize, nmt_dataset, save_plots)
 	log.info("rnn_len_threshold: {}".format(rnn_len_threshold))
 
 	#for i in range(10):
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'are hello ? how you', source_lang_obj, use_cuda)))
+	log.info("{}".format(utils.get_translation(nmt_rnn, 'are hello ? how you', source_lang_obj, use_cuda, save_plots)))
 	
 if __name__ == "__main__":
     main()

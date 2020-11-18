@@ -106,6 +106,7 @@ def main():
 
 	# generate translations
 	use_cuda = True
+	translator = Translator()
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'On March 14 , this year , I posted this poster on Facebook .', source_lang_obj, use_cuda)))
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'This is an image of me and my daughter holding the Israeli flag .', source_lang_obj, use_cuda)))
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'I will try to explain to you about the context of why and when I posted .', source_lang_obj, use_cuda)))

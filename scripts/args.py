@@ -91,7 +91,10 @@ args.add_argument('--self_attention',
 					type=bool,
 					default=False,
 					help='with self-attention')
-
+args.add_argument('--save_plots',
+					type=str,
+					default=False,
+					help='save plots')
 
 def check_args(parser):
     """

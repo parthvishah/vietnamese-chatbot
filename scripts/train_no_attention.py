@@ -35,8 +35,6 @@ def main():
 	log.basicConfig(filename=log_name, format='%(asctime)s | %(name)s -- %(message)s', level=log.INFO)
 	os.chmod(log_name, parser.access_mode)
 
-
-
 	# set devise to CPU if available
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	log.info("Starting experiment {} VN -> EN NMT on {}.".format(parser.experiment,device))
@@ -126,3 +124,8 @@ def main():
 	
 if __name__ == "__main__":
     main()
+
+
+
+
+

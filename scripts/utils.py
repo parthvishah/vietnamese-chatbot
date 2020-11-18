@@ -74,8 +74,7 @@ def train_model(dataloader, nmt, num_epochs=50, val_every=1, saved_model_path = 
     print("Training completed. Best BLEU is {}".format(best_bleu))
 
 
-def get_binned_bl_score(nmt_model, val_dataset, batchSize, nmt_dataset):
-    parser = args.parse_args()
+def get_binned_bl_score(nmt_model, val_dataset, batchSize, nmt_dataset, save_plots):
     len_threshold = np.arange(0, 31, 5)
     bin_bl_score = np.zeros(len(len_threshold))
     
@@ -100,7 +99,7 @@ def get_binned_bl_score(nmt_model, val_dataset, batchSize, nmt_dataset):
     plt.ylim(0, np.max(bin_bl_score)+1)
     plt.xlabel('len')
     plt.ylabel('bl score')
-    script_dir = parser.save_plots
+    script_dir = save_plots
     saved_models_dir = os.path.join(script_dir, 'binnedplot')
     if not os.path.isdir(saved_models_dir):
         os.makedirs(saved_models_dir)
@@ -108,7 +107,7 @@ def get_binned_bl_score(nmt_model, val_dataset, batchSize, nmt_dataset):
     
     return len_threshold, bin_bl_score
 
-def showAttention(input_sentence, output_words, attentions):
+def showAttention(input_sentence, output_words, attentions, save_plots):
     parser = args.parse_args()
     # Set up figure with colorbar
     fig = plt.figure()
@@ -126,7 +125,7 @@ def showAttention(input_sentence, output_words, attentions):
     ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
     plt.show()
-    script_dir = parser.save_plots
+    script_dir = save_plots
     saved_models_dir = os.path.join(script_dir, 'attention')
     if not os.path.isdir(saved_models_dir):
         os.makedirs(saved_models_dir)
@@ -150,7 +149,7 @@ def get_encoded_batch(sentence, lang_obj, use_cuda):
 
     return return_tuple
 
-def get_translation(nmt_model, sentence, lang_obj, use_cuda):
+def get_translation(nmt_model, sentence, lang_obj, use_cuda, save_plots):
     print('souce: ', sentence)
     batch = get_encoded_batch(sentence, lang_obj, use_cuda)
     prediction, attn_scores_list = nmt_model.eval_step(batch, return_attn = True)
@@ -161,4 +160,4 @@ def get_translation(nmt_model, sentence, lang_obj, use_cuda):
         if attn_scores_list[0][0] is not None:
             attn_matrix = [x[0].data.cpu().numpy() for x in attn_scores_list]
             attn_matrix = np.stack(attn_matrix)[:,:, 0]
-            showAttention(sentence, prediction, attn_matrix)
+            showAttention(sentence, prediction, attn_matrix, save_plots)

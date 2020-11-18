@@ -37,7 +37,6 @@ RNN_LAYERS=1
 LONGEST_LABEL=1
 GRADIENT_CLIP=0.3
 EPOCHS=10
-SAVE_PLOTS=${PROJECT}/plots
 
 cd ${PROJECT}
 python ./vietnamese-chatbot/scripts/train_no_attention.py \
@@ -53,5 +52,4 @@ python ./vietnamese-chatbot/scripts/train_no_attention.py \
 	--rnn_layers ${RNN_LAYERS} \
 	--longest_label ${LONGEST_LABEL} \
 	--gradient_clip ${GRADIENT_CLIP} \
-	--epochs ${EPOCHS} \
-	--save_plots ${SAVE_PLOTS}
+	--epochs ${EPOCHS}

@@ -35,8 +35,6 @@ def main():
 	log.basicConfig(filename=log_name, format='%(asctime)s | %(name)s -- %(message)s', level=log.INFO)
 	os.chmod(log_name, parser.access_mode)
 
-
-
 	# set devise to CPU if available
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	log.info("Starting experiment {} VN -> EN NMT on {}.".format(parser.experiment,device))
@@ -112,17 +110,18 @@ def main():
 	else:
 		log.info("Check if this path exists: {}".format(utils.get_full_filepath(saved_models_dir, 'rnn')))
 		log.info("It does not exist! Starting to train...")
-		utils.train_model(dataloader_dict, nmt_rnn,num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = 'rnn_test')
+		utils.train_model(dataloader_dict, nmt_rnn, num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = 'rnn_test')
 	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
 	log.info("We will save the models in this directory: {}".format(saved_models_dir))
+
 	# generate translations
 	use_cuda = True
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'On March 14 , this year , I posted this poster on Facebook .', source_lang_obj, use_cuda)))
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'This is an image of me and my daughter holding the Israeli flag .', source_lang_obj, use_cuda)))
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'I will try to explain to you about the context of why and when I posted .', source_lang_obj, use_cuda)))
-
+	log.info("{}".format(utils.get_translation(nmt_rnn, 'On March 14 , this year , I posted this poster on Facebook .', source_lang_obj, use_cuda, source_name, target_name)))
+	log.info("{}".format(utils.get_translation(nmt_rnn, 'I love to watch science movies on Mondays', source_lang_obj, use_cuda, source_name, target_name)))
+	log.info("{}".format(utils.get_translation(nmt_rnn, 'I want to be the best friend that I can be', source_lang_obj, use_cuda, source_name, target_name)))
+	log.info("{}".format(utils.get_translation(nmt_rnn, 'I love you', source_lang_obj, use_cuda, source_name, target_name)))
 	log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
-	_, _, fig = utils.get_binned_bl_score(nmt_rnn, dataset_dict['val'], plots_dir)
+	_, _, fig = utils.get_binned_bl_score(nmt_rnn, dataset_dict['dev'], plots_dir, batchSize = batchSize)
 
 if __name__ == "__main__":
     main()

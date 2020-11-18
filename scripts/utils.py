@@ -15,6 +15,9 @@ import matplotlib.ticker as ticker
 from googletrans import Translator
 
 import global_variables
+import nmt_dataset
+import nnet_models_new
+from args import args, check_args
 
 def get_full_filepath(path, enc_type):
 	'''

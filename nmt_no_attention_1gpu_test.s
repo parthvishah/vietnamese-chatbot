@@ -40,11 +40,11 @@ GRADIENT_CLIP=0.3
 EPOCHS=10
 
 cd ${PROJECT}
-python ./vietnamese-chatbot/scripts/train_no_attention.py \
+python ./vietnamese-chatbot/scripts/train_no_attention_plots.py \
 	--experiment ${STUDY_NAME} \
 	--save_dir ${SAVE_DIR} \
 	--data_dir ${DATA_DIR} \
-	--plot_dir ${PLOT_DIR} \
+	--plots_dir ${PLOT_DIR} \
 	--batch_size ${BATCH_SIZE} \
 	--learning_rate ${LR} \
 	--seed ${SEED} \

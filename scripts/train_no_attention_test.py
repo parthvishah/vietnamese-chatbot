@@ -105,7 +105,7 @@ def main():
 	# do we want to train again?
 	train_again = False
 
-	saved_file_name 'no_attn_bs{}_lr{}_hs_{}_rnnlayer{}'.format(batchSize, lr, hidden_size, rnn_layers)
+	saved_file_name = 'no_attn_bs{}_lr{}_hs_{}_rnnlayer{}'.format(batchSize, lr, hidden_size, rnn_layers)
 
 	# check if there is a saved model and if we want to train again
 	if os.path.exists(utils.get_full_filepath(saved_models_dir, 'rnn')) and (not train_again):

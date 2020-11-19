@@ -139,10 +139,12 @@ def get_translation(nmt_model, sentence, lang_obj, use_cuda, source_name = 'en',
 	#from googletrans import Translator
 	#translator = Translator()
 	print('source: ', sentence)
+	log.info('source: {}'.format(sentence))
 	batch = get_encoded_batch(sentence, lang_obj, use_cuda);
 	prediction, attn_scores_list = nmt_model.eval_step(batch, return_attn = True);
 	prediction = prediction[0];
 	print('prediction: ', prediction)
+	log.info('prediction: {}'.format(prediction))
 	#print('GT on sentence (src->tgt): ', translator.translate(sentence, src = source_name, dest = target_name).text)
 	#print('GT on prediction (tgt->src): ', translator.translate(prediction, src = target_name, dest = source_name).text)
 

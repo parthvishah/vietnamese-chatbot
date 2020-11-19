@@ -121,6 +121,8 @@ def main():
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'I want to be the best friend that I can be', source_lang_obj, use_cuda, source_name, target_name)))
 	log.info("{}".format(utils.get_translation(nmt_rnn, 'I love you', source_lang_obj, use_cuda, source_name, target_name)))
 	log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
+
+	# export plot
 	_, _, fig = utils.get_binned_bl_score(nmt_rnn, dataset_dict['dev'], plots_dir, batchSize = batchSize)
 
 if __name__ == "__main__":

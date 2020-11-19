@@ -93,7 +93,7 @@ def get_binned_bl_score(nmt_model, val_dataset, location, batchSize):
 	fig = plt.figure()
 	plt.plot(len_threshold, bin_bl_score, 'x-')
 	plt.ylim(0, np.max(bin_bl_score)+1)
-	plt.xlabel('sentence lenth')
+	plt.xlabel('sentence length')
 	plt.ylabel('bleu score')
 	plt.title('Bleu Score vs. Sentence Length')
 	fig.tight_layout()

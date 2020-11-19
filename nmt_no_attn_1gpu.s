@@ -33,11 +33,11 @@ LR=0.25
 SEED=42
 SOURCE_NAME='en'
 TARGET_NAME='vi'
-HIDDEN_SIZE=512
-RNN_LAYERS=1
+HIDDEN_SIZE=1024
+RNN_LAYERS=2
 LONGEST_LABEL=1
 GRADIENT_CLIP=0.3
-EPOCHS=10
+EPOCHS=20
 
 cd ${PROJECT}
 python ./vietnamese-chatbot/scripts/train_no_attention.py \

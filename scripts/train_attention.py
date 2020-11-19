@@ -113,7 +113,7 @@ def main():
 	# check if there is a saved model and if we want to train again
 	if os.path.exists(utils.get_full_filepath(saved_models_dir, modelname)) and (not train_again):
 		log.info("Retrieving saved model from {}".format(utils.get_full_filepath(saved_models_dir, modelname)))
-		nmt_rnn = torch.load(utils.get_full_filepath(saved_models_dir, modelname))
+		nmt_encoderattn = torch.load(utils.get_full_filepath(saved_models_dir, modelname))
 	# train model again
 	else:
 		log.info("Check if this path exists: {}".format(utils.get_full_filepath(saved_models_dir, modelname)))
@@ -124,14 +124,17 @@ def main():
 
 	# generate translations
 	use_cuda = True
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'On March 14 , this year , I posted this poster on Facebook .', source_lang_obj, use_cuda, source_name, target_name)))
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'I love to watch science movies on Mondays', source_lang_obj, use_cuda, source_name, target_name)))
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'I want to be the best friend that I can be', source_lang_obj, use_cuda, source_name, target_name)))
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'I love you', source_lang_obj, use_cuda, source_name, target_name)))
-	log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
-
+	utils.get_translation(nmt_encoderattn, 'I love to watch science movies on Mondays', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_encoderattn, 'I want to be the best friend that I can be', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_encoderattn, 'I love you', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_encoderattn, 'I love football, I like to watch it with my friends. It is always a great time.', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_encoderattn, 'I do not know what I would do without pizza, it is very tasty to eat. If I could have any food in the world it would probably be pizza.', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_encoderattn, 'Trump is the worst president in all of history. He can be a real racist and say very nasty things to people of color.', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_encoderattn, 'Thank you very much.', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_encoderattn, 'Think about your own choices.', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_encoderattn, 'I recently did a survey with over 2,000 Americans , and the average number of choices that the typical American reports making is about 70 in a typical day .', source_lang_obj, use_cuda, source_name, target_name)
 	# export plot
-	_, _, fig = utils.get_binned_bl_score(nmt_rnn, dataset_dict['dev'], plots_dir, batchSize = batchSize)
+	_, _, fig = utils.get_binned_bl_score(nmt_encoderattn, dataset_dict['dev'], plots_dir, batchSize = batchSize)
 
 if __name__ == "__main__":
     main()

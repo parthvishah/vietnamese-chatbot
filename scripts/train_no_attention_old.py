@@ -13,7 +13,6 @@ from datetime import datetime as dt
 import time
 import random
 import numpy as np
-from googletrans import Translator
 
 # =============== Self Defined ===============
 import global_variables
@@ -57,10 +56,8 @@ def main():
 	# get saved models dir
 	base_saved_models_dir = parser.save_dir
 	saved_models_dir = os.path.join(base_saved_models_dir, source_name+'2'+target_name)
-	plots_dir = parser.plots_dir
 
 	log.info("We will save the models in this directory: {}".format(saved_models_dir))
-	log.info("We will save the plots in this directory: {}".format(plots_dir))
 
 	# get data dir
 	main_data_path = parser.data_dir
@@ -102,18 +99,19 @@ def main():
 
 	log.info("Seq2Seq Model with the following parameters: batch_size = {}, learning_rate = {}, hidden_size = {}, rnn_layers = {}, lr = {}, longest_label = {}, gradient_clip = {}, num_epochs = {}, source_name = {}, target_name = {}".format(batchSize, lr, hidden_size, rnn_layers, lr, longest_label, gradient_clip, num_epochs, source_name, target_name))
 
-	log.info("Retrieving saved model from {}".format(utils.get_full_filepath(saved_models_dir, 'rnn_test')))
-	nmt_rnn = torch.load(utils.get_full_filepath(saved_models_dir, 'rnn_test'), map_location=global_variables.device)
+	# do we want to train again?
+	train_again = False
 
-	# generate translations
-	use_cuda = True
-	translator = Translator()
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'On March 14 , this year , I posted this poster on Facebook .', source_lang_obj, use_cuda, source_name, target_name)))
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'I love to watch science movies on Mondays', source_lang_obj, use_cuda, source_name, target_name)))
-	log.info("{}".format(utils.get_translation(nmt_rnn, 'I want to be the best friend that I can be', source_lang_obj, use_cuda, source_name, target_name)))
-
-	log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
-	_, _, fig = utils.get_binned_bl_score(nmt_rnn, dataset_dict['dev'], plots_dir, batchSize = batchSize)
+	# check if there is a saved model and if we want to train again
+	if os.path.exists(utils.get_full_filepath(saved_models_dir, 'rnn')) and (not train_again):
+		log.info("Retrieving saved model from {}".format(utils.get_full_filepath(saved_models_dir, 'rnn')))
+		nmt_rnn = torch.load(utils.get_full_filepath(saved_models_dir, 'rnn'), map_location=global_variables.device)
+	# train model again
+	else:
+		log.info("Check if this path exists: {}".format(utils.get_full_filepath(saved_models_dir, 'rnn')))
+		log.info("It does not exist! Starting to train...")
+		utils.train_model(dataloader_dict, nmt_rnn,num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = 'rnn_test')
+	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
 
 if __name__ == "__main__":
     main()

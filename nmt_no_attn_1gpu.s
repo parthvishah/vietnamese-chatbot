@@ -8,7 +8,7 @@
 #SBATCH --time=48:00:00
 #SBATCH --mail-type=END
 #SBATCH --mail-user=an3056@nyu.edu
-#SBATCH --job-name="seq2seq_noattn_train"
+#SBATCH --job-name="noattn"
 #SBATCH --output=/scratch/an3056/nlp_project/outputs/%j.out
 
 module purge
@@ -40,7 +40,7 @@ GRADIENT_CLIP=0.3
 EPOCHS=10
 
 cd ${PROJECT}
-python ./vietnamese-chatbot/scripts/test.py \
+python ./vietnamese-chatbot/scripts/train_no_attention.py \
 	--experiment ${STUDY_NAME} \
 	--save_dir ${SAVE_DIR} \
 	--data_dir ${DATA_DIR} \

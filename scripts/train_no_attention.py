@@ -90,7 +90,6 @@ def main():
 	gradient_clip = parser.gradient_clip
 	num_epochs = parser.epochs
 
-
 	log.info("The source vocab ({}) has {} words and target vocab ({}) has {} words".format(source_name, source_vocab, target_name, target_vocab))
 
 	# encoder model
@@ -105,7 +104,6 @@ def main():
 
 	# do we want to train again?
 	train_again = False
-	saved_file_name 'no_attn_bs{}_lr{}_hs_{}_rnnlayer{}'.format(batchSize, lr, hidden_size, rnn_layers)
 
 	# check if there is a saved model and if we want to train again
 	if os.path.exists(utils.get_full_filepath(saved_models_dir, 'rnn')) and (not train_again):
@@ -115,7 +113,7 @@ def main():
 	else:
 		log.info("Check if this path exists: {}".format(utils.get_full_filepath(saved_models_dir, 'rnn')))
 		log.info("It does not exist! Starting to train...")
-		utils.train_model(dataloader_dict, nmt_rnn, num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = saved_file_name)
+		utils.train_model(dataloader_dict, nmt_rnn, num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = 'rnn_test')
 	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
 	log.info("We will save the models in this directory: {}".format(saved_models_dir))
 

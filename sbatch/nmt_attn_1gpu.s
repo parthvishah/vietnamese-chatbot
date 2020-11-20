@@ -41,7 +41,7 @@ ENCODER_ATTN=TRUE
 SELF_ATTN=FALSE
 
 cd ${PROJECT}
-python ./vietnamese-chatbot/scripts/train_attention_test.py \
+python ./vietnamese-chatbot/scripts/train_attention.py \
 	--experiment ${STUDY_NAME} \
 	--save_dir ${SAVE_DIR} \
 	--data_dir ${DATA_DIR} \

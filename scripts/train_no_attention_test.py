@@ -35,8 +35,6 @@ def main():
 	log.basicConfig(filename=log_name, format='%(asctime)s | %(name)s -- %(message)s', level=log.INFO)
 	os.chmod(log_name, parser.access_mode)
 
-
-
 	# set devise to CPU if available
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	log.info("Starting experiment {} VN -> EN NMT on {}.".format(parser.experiment,device))
@@ -56,8 +54,10 @@ def main():
 	# get saved models dir
 	base_saved_models_dir = parser.save_dir
 	saved_models_dir = os.path.join(base_saved_models_dir, source_name+'2'+target_name)
+	plots_dir = parser.plots_dir
 
 	log.info("We will save the models in this directory: {}".format(saved_models_dir))
+	log.info("We will save the plots in this directory: {}".format(plots_dir))
 
 	# get data dir
 	main_data_path = parser.data_dir
@@ -71,6 +71,7 @@ def main():
 
 	# get max sentence length by 99% percentile
 	MAX_LEN = int(dataset_dict['train'].main_df['source_len'].quantile(0.9999))
+	log.info("MAX_LEN (99th Percentile) = {}".format(MAX_LEN))
 	batchSize = parser.batch_size
 	log.info("Batch size = {}.".format(batchSize))
 
@@ -89,6 +90,8 @@ def main():
 	gradient_clip = parser.gradient_clip
 	num_epochs = parser.epochs
 
+	log.info("The source vocab ({}) has {} words and target vocab ({}) has {} words".format(source_name, source_vocab, target_name, target_vocab))
+
 	# encoder model
 	encoder_rnn = nnet_models_new.EncoderRNN(input_size = source_vocab, hidden_size = hidden_size, numlayers = rnn_layers)
 	# decoder model
@@ -102,16 +105,35 @@ def main():
 	# do we want to train again?
 	train_again = False
 
+	saved_file_name = 'no_attn_bs{}_lr{}_hs_{}_rnnlayer{}'.format(batchSize, lr, hidden_size, rnn_layers)
+
 	# check if there is a saved model and if we want to train again
 	if os.path.exists(utils.get_full_filepath(saved_models_dir, 'rnn')) and (not train_again):
 		log.info("Retrieving saved model from {}".format(utils.get_full_filepath(saved_models_dir, 'rnn')))
 		nmt_rnn = torch.load(utils.get_full_filepath(saved_models_dir, 'rnn'), map_location=global_variables.device)
 	# train model again
 	else:
-		log.info("Check if this path exists: {}".format(utils.get_full_filepath(saved_models_dir, 'rnn')))
+		log.info("Check if this path exists: {}".format(utils.get_full_filepath(saved_models_dir, saved_file_name)))
 		log.info("It does not exist! Starting to train...")
-		utils.train_model(dataloader_dict, nmt_rnn,num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = 'rnn_test')
+		utils.train_model(dataloader_dict, nmt_rnn, num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = saved_file_name)
 	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
+	log.info("We will save the models in this directory: {}".format(saved_models_dir))
+
+	# generate translations
+	use_cuda = True
+	utils.get_translation(nmt_rnn, 'I love to watch science movies on Mondays', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_rnn, 'I want to be the best friend that I can be', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_rnn, 'I love you', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_rnn, 'I love football, I like to watch it with my friends. It is always a great time.', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_rnn, 'I do not know what I would do without pizza, it is very tasty to eat. If I could have any food in the world it would probably be pizza.', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_rnn, 'Trump is the worst president in all of history. He can be a real racist and say very nasty things to people of color.', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_rnn, 'Thank you very much.', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_rnn, 'Think about your own choices.', source_lang_obj, use_cuda, source_name, target_name)
+	utils.get_translation(nmt_rnn, 'I recently did a survey with over 2,000 Americans , and the average number of choices that the typical American reports making is about 70 in a typical day .', source_lang_obj, use_cuda, source_name, target_name)
+
+	# export plot
+	log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
+	_, _, fig = utils.get_binned_bl_score(nmt_rnn, dataset_dict['dev'], plots_dir, batchSize = batchSize)
 
 if __name__ == "__main__":
     main()

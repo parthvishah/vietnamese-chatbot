@@ -112,14 +112,14 @@ def read_dataset(file, lang = None):
 	'''
 	read dataset as pandas df and normalize each sentence
 	'''
-    f = open(file)
-    list_l = []
-    for line in f:
-        line = normalizeEnString(line) if lang == 'en' else normalizeViString(line)
-        list_l.append(line.strip())
-    df = pd.DataFrame()
-    df['data'] = list_l
-    return df
+	f = open(file)
+	list_l = []
+	for line in f:
+		line = normalizeEnString(line) if lang == 'en' else normalizeViString(line)
+		list_l.append(line.strip())
+	df = pd.DataFrame()
+	df['data'] = list_l
+	return df
 
 
 class Lang:

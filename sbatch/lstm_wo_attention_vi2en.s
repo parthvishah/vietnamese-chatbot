@@ -40,6 +40,8 @@ DEC_EMB=512
 DEC_HIDDEN=1024
 DEC_LAYERS=1
 EPOCHS=15
+ATTN=TRUE
+BEAM_SIZE=3
 
 
 cd ${PROJECT}
@@ -59,4 +61,6 @@ python ./nmt-vi-en/scripts/train_attention.py \
 	--dec_emb ${DEC_EMB} \
 	--dec_hidden ${DEC_HIDDEN} \
 	--dec_layers ${DEC_LAYERS} \
-	--epochs ${EPOCHS}
+	--epochs ${EPOCHS} \
+	--beam_size ${BEAM_SIZE} \
+	--attn

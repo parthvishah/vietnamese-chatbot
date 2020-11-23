@@ -41,7 +41,7 @@ def main():
 	log.basicConfig(filename=log_name, format='%(asctime)s | %(name)s -- %(message)s', level=log.INFO)
 	os.chmod(log_name, parser.access_mode)
 
-	# set devise to CPU if available
+	# set device to CPU if available
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	log.info("Starting experiment {} VN -> EN NMT on {}.".format(parser.experiment,device))
 
@@ -60,37 +60,20 @@ def main():
 	# get saved models dir
 	base_saved_models_dir = parser.save_dir
 	saved_models_dir = os.path.join(base_saved_models_dir, source_name+'2'+target_name)
-	# plots_dir = parser.plots_dir
+	plots_dir = parser.plots_dir
 
 	log.info("We will save the models in this directory: {}".format(saved_models_dir))
-	# log.info("We will save the plots in this directory: {}".format(plots_dir))
+	log.info("We will save the plots in this directory: {}".format(plots_dir))
 
 	# get data dir
 	main_data_path = parser.data_dir
 	path_to_train_data = {'source':main_data_path+'train.tok.'+source_name, 'target':main_data_path+'train.tok.'+target_name}
 	path_to_dev_data = {'source': main_data_path+'dev.tok.'+source_name, 'target':main_data_path+'dev.tok.'+target_name}
-
-	# get language objects
-	# saved_language_model_dir = os.path.join(saved_models_dir, 'lang_obj')
-
-	# get dictionary of datasets
-	#dataset_dict = {'train': nmt_dataset.LanguagePair(source_name = source_name, target_name=target_name, filepath = path_to_train_data, lang_obj_path = saved_language_model_dir, minimum_count = 1), 'dev': nmt_dataset.LanguagePair(source_name = source_name, target_name=target_name, filepath = path_to_dev_data, lang_obj_path = saved_language_model_dir, minimum_count = 1)}
-
-	# get max sentence length by 99% percentile
-	# MAX_LEN = int(dataset_dict['train'].main_df['source_len'].quantile(0.9999))
-	MAX_LEN = 48
-	bs = parser.batch_size
-	log.info("Batch size = {}.".format(bs))
-
-	# dataloader_dict = {'train': DataLoader(dataset_dict['train'], batch_size = batchSize, collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=MAX_LEN), shuffle = True, num_workers=0), 'dev': DataLoader(dataset_dict['dev'], batch_size = batchSize, collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=MAX_LEN), shuffle = True, num_workers=0)}
-
+	path_to_test_data = {'source': main_data_path+'test.tok.'+source_name, 'target':main_data_path+'test.tok.'+target_name}
 
 	# Configuration
-	# source_lang_obj = dataset_dict['train'].source_lang_obj
-	# target_lang_obj = dataset_dict['train'].target_lang_obj
-
-	# source_vocab = dataset_dict['train'].source_lang_obj.n_words;
-	# target_vocab = dataset_dict['train'].target_lang_obj.n_words;
+	bs = parser.batch_size
+	log.info("Batch size = {}.".format(bs))
 
 	enc_emb = parser.enc_emb
 	enc_hidden = parser.enc_hidden
@@ -103,97 +86,92 @@ def main():
 
 	learning_rate = parser.learning_rate
 	num_epochs = parser.epochs
-	
-	enc_pth_name = parser.enc_pth_name
-	dec_pth_name = parser.dec_pth_name
-	
-	train, val, test, en_lang, vi_lang = dataset_helper.train_val_load(MAX_LEN, "", main_data_path)
+	attn_flag = parser.attn
+	log.info("The attention flag is set to {}".format(attn_flag))
+	beam_size = parser.beam_size
+	log.info("We evaluate using beam size of {}".format(beam_size))
 
-	bs_dict = {'train':bs,'validate':1, 'train_val':1,'val_train':bs, 'test':1}
-	shuffle_dict = {'train':True,'validate':False, 'train_val':False,'val_train':True, 'test':False}
-	# train_used = shuffle_sorted_batches(train_sorted, bs_dict['train'])
-	# train_used = train.iloc[:50]
+	train, val, test, en_lang, vi_lang = train_val_load("", main_data_path)
+
+	# get vocab sizes
+	log.info('English has vocab size of: {} words.'.format(en_lang.n_words))
+	log.info('Vietnamese has vocab size of: {} words.'.format(vi_lang.n_words))
+
+	# get max sentence length by 95% percentile
+	MAX_LEN = int(train['en_len'].quantile(0.95))
+	log.info('We will have a max sentence length of {} (95 percentile)'.format(MAX_LEN))
+
+	# set data loaders
+	bs_dict = {'train':bs, 'validate':1, 'test':1}
+	shuffle_dict = {'train':True, 'validate':False, 'test':False}
+
 	train_used = train
 	val_used = val
-	# val_used = val.iloc[:20]
-	collate_fn_dict = {'train':dataset_helper.vocab_collate_func,
-					   'validate':dataset_helper.vocab_collate_func_val,
-					   'train_val':dataset_helper.vocab_collate_func_val,
-					   'val_train':dataset_helper.vocab_collate_func,
-					   'test': dataset_helper.vocab_collate_func_val}
 
-	transformed_dataset = {'train': dataset_helper.Vietnamese(train_used),
-	                       'validate': dataset_helper.Vietnamese(val_used, val = True),
-	                       'train_val':dataset_helper.Vietnamese(train.iloc[:50], val = True),
-	                       'val_train':dataset_helper.Vietnamese(val_used),
-	                       'test':dataset_helper.Vietnamese(test, val= True)
-	                                               }
+	collate_fn_dict = {'train':dataset_helper.vocab_collate_func, 'validate':dataset_helper.vocab_collate_func_val, 'test': dataset_helper.vocab_collate_func_val}
 
-	dataloader = {x: DataLoader(transformed_dataset[x], batch_size=bs_dict[x], collate_fn=collate_fn_dict[x],
-	                    shuffle=shuffle_dict[x], num_workers=0) for x in ['train', 'validate', 'train_val','val_train', 'test']}
+	transformed_dataset = {'train': dataset_helper.Vietnamese(train_used), 'validate': dataset_helper.Vietnamese(val_used, val = True), 'test':dataset_helper.Vietnamese(test, val= True)}
 
-	# log.info("encoder_attention = {}, self_attention = {}".format(encoder_attention, self_attention))
+	dataloader = {x: DataLoader(transformed_dataset[x], batch_size=bs_dict[x], collate_fn=collate_fn_dict[x], shuffle=shuffle_dict[x], num_workers=0) for x in ['train', 'validate', 'test']}
 
-	# # encoder model
-	# encoder_encoderattn = nnet_models_new.EncoderRNN(input_size = source_vocab, hidden_size = hidden_size, numlayers = rnn_layers)
-	#
-	# # decoder model
-	# decoder_encoderattn = nnet_models_new.Decoder_SelfAttn(output_size = target_vocab, hidden_size = hidden_size, encoder_attention = encoder_attention, self_attention = self_attention)
-	#
-	# # seq2seq model
-	# nmt_encoderattn = nnet_models_new.seq2seq(encoder_encoderattn, decoder_encoderattn, lr = lr, hiddensize = hidden_size, numlayers = hidden_size, target_lang=dataset_dict['train'].target_lang_obj, longest_label = longest_label, clip = gradient_clip, device = device)
+	# instantiate encoder/decoder
+	encoder_w_att = nnet_models.EncoderRNN(input_size = vi_lang.n_words, embed_dim = enc_emb, hidden_size = enc_hidden, n_layers=enc_layers, rnn_type=rnn_type).to(device)
+	decoder_w_att = nnet_models.AttentionDecoderRNN(output_size = en_lang.n_words, embed_dim = dec_emb, hidden_size = dec_hidden, n_layers = dec_layers, attention = attn_flag).to(device)
 
-	encoder_w_att = nnet_models.EncoderRNN(vi_lang.n_words, enc_emb, enc_hidden, n_layers=enc_layers, rnn_type=rnn_type).to(device)
-	decoder_w_att = nnet_models.AttentionDecoderRNN(en_lang.n_words, dec_emb, dec_hidden, n_layers=dec_layers, attention=True).to(device)
+	# instantiate optimizer
+	if parser.optimizer == 'sgd':
+		encoder_optimizer = optim.SGD(encoder_w_att.parameters(), lr = learning_rate, nesterov = True, momentum = 0.99)
+		decoder_optimizer = optim.SGD(decoder_w_att.parameters(), lr = learning_rate,nesterov = True, momentum = 0.99)
+	elif parser.optimizer == 'adam':
+		encoder_optimizer = optim.Adam(encoder_w_att.parameters(), lr = 5e-3)
+		decoder_optimizer = optim.Adam(decoder_wo_att.parameters(), lr = 5e-3)
 
-	encoder_optimizer = optim.SGD(encoder_w_att.parameters(), lr=learning_rate, nesterov=True, momentum = 0.99)
+	# instantiate scheduler
 	enc_scheduler = ReduceLROnPlateau(encoder_optimizer, min_lr=1e-4, factor = 0.5, patience=0)
-	decoder_optimizer = optim.SGD(decoder_w_att.parameters(), lr=learning_rate,nesterov=True, momentum = 0.99)
 	dec_scheduler = ReduceLROnPlateau(decoder_optimizer, min_lr=1e-4, factor = 0.5, patience=0)
-	criterion = nn.NLLLoss()
+	criterion = nn.NLLLoss(ignore_index = global_variables.PAD_IDX)
 
 	log.info("Seq2Seq Model with the following parameters: batch_size = {}, learning_rate = {}, rnn_type = {}, enc_emb = {}, enc_hidden = {}, enc_layers = {}, dec_emb = {}, dec_hidden = {}, dec_layers = {}, num_epochs = {}, source_name = {}, target_name = {}".format(bs, learning_rate, rnn_type, enc_emb, enc_hidden, enc_layers, dec_emb, dec_hidden, dec_layers, num_epochs, source_name, target_name))
 
 	# do we want to train again?
 	train_again = False
-	modelname = 'w_att'
+	encoder_save = '{}_att_{}_enc_{}_layer.pth'.format(rnn_type, parser.optimizer, enc_layers)
+	deecoder_save = '{}_att_{}_dec_{}_layer.pth'.format(rnn_type, parser.optimizer, dec_layers)
 
-	# if os.path.exists('lstm_wo_att_enc_1_layer.pth') and os.path.exists('lstm_wo_att_dec_1_layer.pth'):
-	if os.path.exists(utils.get_full_filepath(saved_models_dir, modelname)) and (not train_again):
-		log.info("Retrieving saved model from {}".format(utils.get_full_filepath(saved_models_dir, modelname)))
-		encoder_w_att.load_state_dict(torch.load(saved_models_dir+"lstm_w_att_enc.pth"))
-		decoder_w_att.load_state_dict(torch.load(saved_models_dir+"lstm_w_att_dec.pth"))
+	if os.path.exists(utils.get_full_filepath(saved_models_dir, encoder_save)) and os.path.exists(utils.get_full_filepath(saved_models_dir, decoder_save)) and (not train_again):
+		log.info("Retrieving saved encoder from {}".format(utils.get_full_filepath(saved_models_dir, encoder_save)))
+		log.info("Retrieving saved decoder from {}".format(utils.get_full_filepath(saved_models_dir, decoder_save)))
+		encoder_w_att.load_state_dict(torch.load(saved_models_dir+encoder_save))
+		decoder_w_att.load_state_dict(torch.load(saved_models_dir+decoder_save))
 	else:
-		log.info("Check if this path exists: {}".format(utils.get_full_filepath(saved_models_dir, modelname)))
-		log.info("It does not exist! Starting to train...")
-		train_utilities.train_model(encoder_optimizer, decoder_optimizer, encoder_w_att, decoder_w_att, criterion, "attention", dataloader, en_lang, vi_lang, saved_models_dir, enc_pth_name, dec_pth_name, num_epochs = num_epochs, rm = 0.95, enc_scheduler = enc_scheduler, dec_scheduler = dec_scheduler)
+		log.info("Check if encoder path exists: {}".format(utils.get_full_filepath(saved_models_dir, encoder_save)))
+		log.info("Check if decoder path exists: {}".format(utils.get_full_filepath(saved_models_dir, decoder_save)))
+		log.info("Encoder and Decoder do not exist! Starting to train...")
+		train_utilities.train_model(encoder_optimizer, decoder_optimizer, encoder_w_att, decoder_w_att, criterion, "attention", dataloader, en_lang, vi_lang, saved_models_dir, num_epochs = num_epochs, rm = 0.95, enc_scheduler = enc_scheduler, dec_scheduler = dec_scheduler)
+		torch.save(encoder_w_att.state_dict(), encoder_save)
+		torch.save(decoder_w_att.state_dict(), decoder_save)
 		log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
-		log.info("We will save the models in this directory: {}".format(saved_models_dir))
+		log.info("We will save the encoder/decoder in this directory: {}".format(saved_models_dir))
 
 
-	# generate translations
-	# encoder_w_att.load_state_dict(torch.load(saved_models_dir+'lstm_w_att_enc.pth'))
-	# decoder_w_att.load_state_dict(torch.load(saved_models_dir+'lstm_w_att_dec.pth'))
-	#
-	# log.info("Generating translations (replace_unk = False)")
-	#
-	# bleu_3_no_unk, att_score_no_unk_w, pred_no_unk_w, src_no_unk_w = validation_beam_search(encoder_w_att, decoder_w_att,dataloader['validate'],en_lang,\
-    #                                                                   vi_lang, 'attention',3,verbose=False)
-	# use_cuda = True
-	# # log.info("{}".format(utils.get_translation(nmt_rnn, 'On March 14 , this year , I posted this poster on Facebook .', source_lang_obj, use_cuda, source_name, target_name)))
-	# # log.info("{}".format(utils.get_translation(nmt_rnn, 'I love to watch science movies on Mondays', source_lang_obj, use_cuda, source_name, target_name)))
-	# # log.info("{}".format(utils.get_translation(nmt_rnn, 'I want to be the best friend that I can be', source_lang_obj, use_cuda, source_name, target_name)))
-	# # log.info("{}".format(utils.get_translation(nmt_rnn, 'I love you', source_lang_obj, use_cuda, source_name, target_name)))
-	# log.info(")
-	#
-	# log.info("Generating translations (replace_unk = True)")
-	# bleu_3_unk, att_score_unk_w, pred_unk_w, src_unk_w = validation_beam_search(encoder_w_att, decoder_w_att,dataloader['validate'],en_lang,\
-    #                                                                   vi_lang, 'attention',3,verbose=False,\
-    #                                                                replace_unk = True)
-	# log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
+	# BLEU with beam size
+	bleu_no_unk, att_score_wo, pred_wo, src_wo = validation_beam_search(encoder_w_att, decoder_w_att, dataloader['validate'], en_lang, vi_lang, 'attention', beam_size, verbose = False)
 
-	# export plot
-	# _, _, fig = utils.get_binned_bl_score(nmt_rnn, dataset_dict['dev'], plots_dir, batchSize = batchSize)
+	log.info("Bleu-{} Score (No UNK): {}".format(beam_size, bleu_no_unk))
+
+	bleu_unk, att_score_wo, pred_wo, src_wo = validation_beam_search(encoder_wo_att, decoder_wo_att,dataloader['validate'], en_lang, vi_lang, 'no_attention', beam_size, verbose = False, replace_unk = True)
+
+	log.info("Bleu-{} Score (UNK): {}".format(beam_size, bleu_unk))
+
+	# generate 5 random predictions
+	indexes = range(len(pred_wo))
+	for i in np.random.choice(indexes, 5):
+		print('Source: {} \nPrediction: {}\n---'.format(src_wo[i], pred_wo[i]))
+		log.info('Source: {} \nPrediction: {}\n---'.format(src_wo[i], pred_wo[i]))
+
+	log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
+	_, _, fig = get_binned_bl_score(encoder, decoder, transformed_dataset['validate'], attn_flag, beam_size, plots_dir)
+
 
 if __name__ == "__main__":
     main()

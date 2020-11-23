@@ -71,6 +71,10 @@ args.add_argument('--logging_steps',
 					type=int,
 					default=1e4,
 					help='logs best weights every X update steps for experiment')
+args.add_argument('--optimizer',
+					type=str,
+					default='sgd',
+					help='specify what type of optimizer to use for training ("sgd","adam")')
 # args.add_argument('--hidden_size',
 # 					type=int,
 # 					default=512,
@@ -115,20 +119,15 @@ args.add_argument('--epochs',
 					type=int,
 					default=10,
 					help='number of epochs')
-# args.add_argument('--encoder_attention',
-# 					action='store_false',
-# 					help='with encoder attention')
-# args.add_argument('--self_attention',
-# 					action='store_true',
-# 					help='with self-attention')
-args.add_argument('--enc_pth_name',
-                                        type=str,
-                                        default='enc',
-                                        help='encoder .pth file name')
-args.add_argument('--dec_pth_name',
-                                        type=str,
-                                        default='dec',
-                                        help='decoder .pth file name')
+args.add_argument('--attn',
+ 					action='store_true',
+ 					help='with encoder attention')
+args.add_argument('--beam_size',
+ 					type=int,
+					default=3,
+ 					help='beam size for eval')
+
+
 
 def check_args(parser):
     """

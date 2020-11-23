@@ -108,7 +108,7 @@ def main():
 	train_used = train
 	val_used = val
 
-	collate_fn_dict = {'train':dataset_helper.vocab_collate_func, 'validate':dataset_helper.vocab_collate_func_val, 'test': dataset_helper.vocab_collate_func_val}
+	collate_fn_dict = {'train':partial(dataset_helper.vocab_collate_func, MAX_LEN = MAX_LEN), 'validate':dataset_helper.vocab_collate_func_val, 'test': dataset_helper.vocab_collate_func_val}
 
 	transformed_dataset = {'train': dataset_helper.Vietnamese(train_used), 'validate': dataset_helper.Vietnamese(val_used, val = True), 'test':dataset_helper.Vietnamese(test, val= True)}
 

@@ -103,7 +103,10 @@ def main():
 
 	learning_rate = parser.learning_rate
 	num_epochs = parser.epochs
-
+	
+	enc_pth_name = parser.enc_pth_name
+	dec_pth_name = parser.dec_pth_name
+	
 	train, val, test, en_lang, vi_lang = dataset_helper.train_val_load(MAX_LEN, "", main_data_path)
 
 	bs_dict = {'train':bs,'validate':1, 'train_val':1,'val_train':bs, 'test':1}
@@ -163,7 +166,7 @@ def main():
 	else:
 		log.info("Check if this path exists: {}".format(utils.get_full_filepath(saved_models_dir, modelname)))
 		log.info("It does not exist! Starting to train...")
-		train_utilities.train_model(encoder_optimizer, decoder_optimizer, encoder_w_att, decoder_w_att, criterion, "attention", dataloader, en_lang, vi_lang, saved_models_dir, num_epochs = num_epochs, rm = 0.95, enc_scheduler = enc_scheduler, dec_scheduler = dec_scheduler)
+		train_utilities.train_model(encoder_optimizer, decoder_optimizer, encoder_w_att, decoder_w_att, criterion, "attention", dataloader, en_lang, vi_lang, saved_models_dir, enc_pth_name, dec_pth_name, num_epochs = num_epochs, rm = 0.95, enc_scheduler = enc_scheduler, dec_scheduler = dec_scheduler)
 		log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
 		log.info("We will save the models in this directory: {}".format(saved_models_dir))
 

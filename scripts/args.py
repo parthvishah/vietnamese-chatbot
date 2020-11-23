@@ -121,7 +121,14 @@ args.add_argument('--epochs',
 # args.add_argument('--self_attention',
 # 					action='store_true',
 # 					help='with self-attention')
-
+args.add_argument('--enc_pth_name',
+                                        type=str,
+                                        default='enc',
+                                        help='encoder .pth file name')
+args.add_argument('--dec_pth_name',
+                                        type=str,
+                                        default='dec',
+                                        help='decoder .pth file name')
 
 def check_args(parser):
     """

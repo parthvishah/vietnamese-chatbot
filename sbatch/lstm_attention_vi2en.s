@@ -26,7 +26,7 @@ PROJECT=/scratch/${NETID}/nlp_project
 # Set arguments
 STUDY_NAME=attn_lstm_128bs_512em_3beam_1layer
 SAVE_DIR=${PROJECT}/saved_models
-DATA_DIR=${PROJECT}/nmt-vi-en/data/iwslt-vi-en
+DATA_DIR=${PROJECT}/nmt-vi-en/data/interim/iwslt15-en-vn
 BATCH_SIZE=128
 LR=0.25
 SEED=42

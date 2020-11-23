@@ -269,7 +269,7 @@ def encode_decode(encoder, decoder, data_en, data_de, src_len, tar_len, rand_num
 		return d_out
 
 
-def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun, m_type, dataloader, en_lang, vi_lang, save_path, num_epochs=60, val_every = 1, train_bleu_every = 10,clip = 0.1, rm = 0.8, enc_scheduler = None, dec_scheduler = None, enc_dec_fn = encode_decode, val_fn = validation_new):
+def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun, m_type, dataloader, en_lang, vi_lang, save_path, encoder_save, decoder_save, num_epochs=60, val_every = 1, train_bleu_every = 10,clip = 0.1, rm = 0.8, enc_scheduler = None, dec_scheduler = None, enc_dec_fn = encode_decode, val_fn = validation_new):
 	'''
 	'''
 	best_score = 0
@@ -337,13 +337,13 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 				best_bleu = val_bleu_score
 				best_encoder_wts = encoder.state_dict()
 				best_decoder_wts = decoder.state_dict()
-
+				# save best model
+				utils.save_models(best_encoder_wts, save_path, encoder_save)
+				utils.save_models(best_decoder_wts, save_path, decoder_save)
 		print('='*50)
-	encoder.load_state_dict(best_encoder_wts)
-	decoder.load_state_dict(best_decoder_wts)
+	encoder.load_state_dict(best_encoder_wts)		encoder.load_state_dict(best_encoder_wts)
 	print("Training completed. Best BLEU is {}".format(best_bleu))
-	return encoder,decoder,loss_hist,bleu_hist
-
+	return encoder, decoder, loss_hist, bleu_hist
 
 def flatten_cel_loss(input,target,nll):
 	input = input.transpose(1,2)

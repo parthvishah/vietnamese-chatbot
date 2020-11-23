@@ -147,9 +147,7 @@ def main():
 		log.info("Check if encoder path exists: {}".format(utils.get_full_filepath(saved_models_dir, encoder_save)))
 		log.info("Check if decoder path exists: {}".format(utils.get_full_filepath(saved_models_dir, decoder_save)))
 		log.info("Encoder and Decoder do not exist! Starting to train...")
-		train_utilities.train_model(encoder_optimizer, decoder_optimizer, encoder_w_att, decoder_w_att, criterion, "attention", dataloader, en_lang, vi_lang, saved_models_dir, num_epochs = num_epochs, rm = 0.95, enc_scheduler = enc_scheduler, dec_scheduler = dec_scheduler)
-		torch.save(encoder_w_att.state_dict(), encoder_save)
-		torch.save(decoder_w_att.state_dict(), decoder_save)
+		train_utilities.train_model(encoder_optimizer, decoder_optimizer, encoder_w_att, decoder_w_att, criterion, "attention", dataloader, en_lang, vi_lang, saved_models_dir, encoder_save, decoder_save, num_epochs = num_epochs, rm = 0.95, enc_scheduler = enc_scheduler, dec_scheduler = dec_scheduler)
 		log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
 		log.info("We will save the encoder/decoder in this directory: {}".format(saved_models_dir))
 

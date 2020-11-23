@@ -341,7 +341,8 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 				utils.save_models(best_encoder_wts, save_path, encoder_save)
 				utils.save_models(best_decoder_wts, save_path, decoder_save)
 		print('='*50)
-	encoder.load_state_dict(best_encoder_wts)		encoder.load_state_dict(best_encoder_wts)
+	encoder.load_state_dict(best_encoder_wts)
+	decoder.load_state_dict(best_decoder_wts)
 	print("Training completed. Best BLEU is {}".format(best_bleu))
 	return encoder, decoder, loss_hist, bleu_hist
 

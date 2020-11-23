@@ -64,7 +64,7 @@ def Linear(in_features, out_features, bias=True, dropout=0):
 	m.weight.data.uniform_(-0.1, 0.1)
 	if bias:
 		m.bias.data.uniform_(-0.1, 0.1)
-    return m
+	return m
 
 
 def sequence_mask(sequence_length, max_len=None, device = 'cuda'):

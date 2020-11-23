@@ -24,9 +24,9 @@ source activate nmt_env
 PROJECT=/scratch/${NETID}/nlp_project
 
 # Set arguments
-STUDY_NAME=nmt_attn_1gpu #nmt_attn_batchsize_learningrate_gpus
+STUDY_NAME=attn_lstm_128bs_512em_3beam_1layer
 SAVE_DIR=${PROJECT}/saved_models
-DATA_DIR=${PROJECT}/vietnamese-chatbot-2/data2/iwslt-vi-en
+DATA_DIR=${PROJECT}/nmt-vi-en/data/iwslt-vi-en
 BATCH_SIZE=128
 LR=0.25
 SEED=42

@@ -30,18 +30,18 @@ import time
 This .py file contains the following classes/functions:
 
 Classes:
-    Vietnamese(df, val = False)
-    Lang(name, minimum_count = 5)
+	Vietnamese(df, val = False)
+	Lang(name, minimum_count = 5)
 
 Functions:
-    normalizeEnString(s)
-    normalizeViString(s)
-    read_dataset(file, lang = None)
-    split(df)
-    token2index_dataset(df,en_lang,vi_lang)
-    train_val_load(MAX_LEN, old_lang_obj, path)
-    vocab_collate_func(batch)
-    vocab_collate_func_val(batch)
+	normalizeEnString(s)
+	normalizeViString(s)
+	read_dataset(file, lang = None)
+	split(df)
+	token2index_dataset(df,en_lang,vi_lang)
+	train_val_load(MAX_LEN, old_lang_obj, path)
+	vocab_collate_func(batch)
+	vocab_collate_func_val(batch)
 
 """
 
@@ -168,9 +168,9 @@ def split(df):
 	'''
 	create tokenized col for source and target lang
 	'''
-    df['en_tokenized'] = df["en_data"].apply(lambda x:x.lower().split( ))
-    df['vi_tokenized'] = df['vi_data'].apply(lambda x:x.lower().split( ))
-    return df
+	df['en_tokenized'] = df["en_data"].apply(lambda x:x.lower().split( ))
+	df['vi_tokenized'] = df['vi_data'].apply(lambda x:x.lower().split( ))
+	return df
 
 
 

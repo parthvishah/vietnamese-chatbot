@@ -198,14 +198,14 @@ def train_val_load(old_lang_obj, path):
 	'''
 
 	# load en and normalize
-	en_train = read_dataset(path+"/iwslt-vi-en/train.tok.en", lang = 'en')
-	en_val = read_dataset(path+"/iwslt-vi-en/dev.tok.en", lang = 'en')
-	en_test = read_dataset(path+"/iwslt-vi-en/test.tok.en", lang = 'en')
+	en_train = read_dataset(path+"/train.tok.en", lang = 'en')
+	en_val = read_dataset(path+"/dev.tok.en", lang = 'en')
+	en_test = read_dataset(path+"/test.tok.en", lang = 'en')
 
 	# load vn and normalize
-	vi_train = read_dataset(path+"/iwslt-vi-en/train.tok.vi", lang = 'vi')
-	vi_val = read_dataset(path+"/iwslt-vi-en/dev.tok.vi", lang = 'vi')
-	vi_test = read_dataset(path+"/iwslt-vi-en/test.tok.vi", lang = 'vi')
+	vi_train = read_dataset(path+"/train.tok.vi", lang = 'vi')
+	vi_val = read_dataset(path+"/dev.tok.vi", lang = 'vi')
+	vi_test = read_dataset(path+"/test.tok.vi", lang = 'vi')
 
 	# add sentence column for train
 	train = pd.DataFrame()

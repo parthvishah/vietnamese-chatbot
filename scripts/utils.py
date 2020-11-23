@@ -45,10 +45,12 @@ def save_models(model, path, nn_type):
 	filename = "lstm_w_att_"+nn_type+".pth"
 	torch.save(model, os.path.join(path, filename))
 
-def get_binned_bl_score(encoder, decoder, val_dataset, min_len = 0, max_len = 30):
+def get_binned_bl_score(encoder, decoder, val_dataset, attn_flag, beam_size, location, min_len = 0, max_len = 30):
 	'''
 	return plot for binned bleu scores
 	'''
+
+	attn_str = 'attention' if attn_flag == True else 'no_attention'
 
 	# set bins
 	len_threshold = np.arange(min_len, max_len + 1, 5)
@@ -68,9 +70,8 @@ def get_binned_bl_score(encoder, decoder, val_dataset, min_len = 0, max_len = 30
 		temp_loader = DataLoader(temp_dataset, batch_size = 1, collate_fn = vocab_collate_func_val, shuffle = False, num_workers=0)
 
 		# evaluate
-		bin_bl_score[i], _, _, _ = validation_beam_search(encoder, decoder, temp_loader,en_lang,\
-		vi_lang, 'no_attention',3,verbose=False)
-		
+		bin_bl_score[i], _, _, _ = validation_beam_search(encoder, decoder, temp_loader, en_lang, vi_lang, attn_str, beam_size, verbose = False)
+
 	# plot bleu score vs. sent lengh
 	len_threshold = len_threshold[1:]
 	bin_bl_score = bin_bl_score[1:]

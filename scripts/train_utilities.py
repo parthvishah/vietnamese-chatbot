@@ -7,7 +7,6 @@ import copy
 import numpy as np
 import utils
 import tqdm
-from tqdm import notebook
 import logging as log
 
 import global_variables
@@ -294,7 +293,7 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 				encoder.eval()
 				decoder.eval()
 
-			for i, data in notebook.tqdm(enumerate(dataloader[phase]), total = len(dataloader[phase])):
+			for i, data in enumerate(dataloader[phase]):
 
 				encoder_optimizer.zero_grad()
 				decoder_optimizer.zero_grad()

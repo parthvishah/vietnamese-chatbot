@@ -330,7 +330,7 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 			enc_scheduler.step(loss_hist['train'][-1])
 			dec_scheduler.step(loss_hist['train'][-1])
 		if epoch%val_every == 0:
-			val_bleu_score, _  _ , _ = val_fn(encoder, decoder, dataloader['validate'], en_lang, vi_lang, m_type, verbose=False, replace_unk=True)
+			val_bleu_score, _, _ , _ = val_fn(encoder, decoder, dataloader['validate'], en_lang, vi_lang, m_type, verbose=False, replace_unk=True)
 			bleu_hist['validate'].append(val_bleu_score)
 			print("validation BLEU = ", val_bleu_score)
 			if val_bleu_score > best_bleu:

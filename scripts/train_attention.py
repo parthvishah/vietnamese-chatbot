@@ -91,7 +91,7 @@ def main():
 	beam_size = parser.beam_size
 	log.info("We evaluate using beam size of {}".format(beam_size))
 
-	train, val, test, en_lang, vi_lang = train_val_load("", main_data_path)
+	train, val, test, en_lang, vi_lang = dataset_helper.train_val_load("", main_data_path)
 
 	# get vocab sizes
 	log.info('English has vocab size of: {} words.'.format(en_lang.n_words))

@@ -10,16 +10,16 @@ import bleu_score
 This .py file contains the following classes/functions:
 
 Classes:
-    EncoderRNN(input_size, embed_dim, hidden_size,n_layers, rnn_type = 'lstm', device = 'cuda')
-    Attention_Module(hidden_dim, output_dim, device = 'cuda')
-    AttentionDecoderRNN(output_size, embed_dim, hidden_size, n_layers = 1, attention = True, device = 'cuda')
+	EncoderRNN(input_size, embed_dim, hidden_size,n_layers, rnn_type = 'lstm', device = 'cuda')
+	Attention_Module(hidden_dim, output_dim, device = 'cuda')
+	AttentionDecoderRNN(output_size, embed_dim, hidden_size, n_layers = 1, attention = True, device = 'cuda')
 
 Functions:
-    Embedding(num_embeddings, embedding_dim, padding_idx)
-    LSTM(input_size, hidden_size, **kwargs)
-    LSTMCell(input_size, hidden_size, **kwargs)
-    Linear(in_features, out_features, bias=True, dropout=0)
-    sequence_mask(sequence_length, max_len=None, device = 'cuda')
+	Embedding(num_embeddings, embedding_dim, padding_idx)
+	LSTM(input_size, hidden_size, **kwargs)
+	LSTMCell(input_size, hidden_size, **kwargs)
+	Linear(in_features, out_features, bias=True, dropout=0)
+	sequence_mask(sequence_length, max_len=None, device = 'cuda')
 """
 
 
@@ -57,7 +57,7 @@ def LSTMCell(input_size, hidden_size, **kwargs):
 
 
 def Linear(in_features, out_features, bias=True, dropout=0):
-    '''
+	'''
 	Linear layer (input: N x T x C)
 	'''
 	m = nn.Linear(in_features, out_features, bias=bias)

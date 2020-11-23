@@ -19,10 +19,10 @@ args.add_argument('--save_dir',
                   type=str,
                   default='results',
                   help='directory to save results')
-# args.add_argument('--plots_dir',
-#                   type=str,
-#                   default='plot',
-#                   help='directory to save results')
+args.add_argument('--plots_dir',
+                   type=str,
+                   default='plot',
+                   help='directory to save results')
 args.add_argument('--seed',
                   type=int,
                   default=42,

@@ -87,9 +87,9 @@ def main():
 	learning_rate = parser.learning_rate
 	num_epochs = parser.epochs
 	attn_flag = parser.attn
-	log.info("The attention flag is set to {}".format(attn_flag))
+	log.info("The attention flag is set to {}.".format(attn_flag))
 	beam_size = parser.beam_size
-	log.info("We evaluate using beam size of {}".format(beam_size))
+	log.info("We evaluate using beam size of {}.".format(beam_size))
 
 	train, val, test, en_lang, vi_lang = dataset_helper.train_val_load("", main_data_path)
 
@@ -99,7 +99,7 @@ def main():
 
 	# get max sentence length by 95% percentile
 	MAX_LEN = int(train['en_len'].quantile(0.95))
-	log.info('We will have a max sentence length of {} (95 percentile)'.format(MAX_LEN))
+	log.info('We will have a max sentence length of {} (95 percentile).'.format(MAX_LEN))
 
 	# set data loaders
 	bs_dict = {'train':bs, 'validate':1, 'test':1}
@@ -135,8 +135,8 @@ def main():
 
 	# do we want to train again?
 	train_again = False
-	encoder_save = '{}_att_{}_enc_{}_layer.pth'.format(rnn_type, parser.optimizer, enc_layers)
-	deecoder_save = '{}_att_{}_dec_{}_layer.pth'.format(rnn_type, parser.optimizer, dec_layers)
+	encoder_save = '{}_att_{}_enc_{}_layer'.format(rnn_type, parser.optimizer, enc_layers)
+	decoder_save = '{}_att_{}_dec_{}_layer'.format(rnn_type, parser.optimizer, dec_layers)
 
 	if os.path.exists(utils.get_full_filepath(saved_models_dir, encoder_save)) and os.path.exists(utils.get_full_filepath(saved_models_dir, decoder_save)) and (not train_again):
 		log.info("Retrieving saved encoder from {}".format(utils.get_full_filepath(saved_models_dir, encoder_save)))

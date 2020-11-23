@@ -323,8 +323,7 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 			loss_hist[phase].append(epoch_loss)
 
 			print("epoch {} {} loss = {}, time = {}".format(epoch, phase, epoch_loss, time.time() - start))
-			# log.info(f"epoch {epoch} {phase} loss = {epoch_loss}, time = {time.time() - start}")
-			# log.info(f"epoch {epoch} | loss {epoch_loss} | time = {time.time() - start} | validation bleu = {val_bleu_score}")
+
 
 		if (enc_scheduler is not None) and (dec_scheduler is not None):
 			enc_scheduler.step(loss_hist['train'][-1])
@@ -333,18 +332,17 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 			val_bleu_score, _, _ , _ = val_fn(encoder, decoder, dataloader['validate'], en_lang, vi_lang, m_type, verbose=False, replace_unk=True)
 			bleu_hist['validate'].append(val_bleu_score)
 			print("validation BLEU = ", val_bleu_score)
+			log.info(f"epoch {epoch} | loss {epoch_loss} | time = {time.time() - start} | validation bleu = {val_bleu_score}")
 			if val_bleu_score > best_bleu:
 				best_bleu = val_bleu_score
 				best_encoder_wts = encoder.state_dict()
 				best_decoder_wts = decoder.state_dict()
-				utils.save_models(best_encoder_wts, save_path, 'enc_bs128')
-				utils.save_models(best_decoder_wts, save_path, 'dec_bs128')
-			log.info(f"epoch {epoch} | loss {epoch_loss} | time = {time.time() - start} | validation bleu = {val_bleu_score}")
+
 		print('='*50)
-	# encoder.load_state_dict(best_encoder_wts)
-	# decoder.load_state_dict(best_decoder_wts)
+	encoder.load_state_dict(best_encoder_wts)
+	decoder.load_state_dict(best_decoder_wts)
 	print("Training completed. Best BLEU is {}".format(best_bleu))
-	# return encoder,decoder,loss_hist,bleu_hist
+	return encoder,decoder,loss_hist,bleu_hist
 
 
 def flatten_cel_loss(input,target,nll):

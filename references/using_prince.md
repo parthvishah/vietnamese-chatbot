@@ -38,7 +38,7 @@ Setup
 
 9. Create a copy of `lstm_attention_vi2en.s` and rename it as `{rnn_type}_{attention/no_attention}_vi2en.s` based on what configuration you are running. You will need to also change the hyperparameters and other arguments to your netid within the file. 
 
-10. Make sure the `STUDY_NAME` argument is in the following format {attn/no_attn}_{rnn_type}_{batch_size}_{embedding_size}_{num_RNN_layers} so that the generated files are easier to maintain.
+10. Make sure the `STUDY_NAME` argument is in the following format `{attn/no_attn}_{rnn_type}_{batch_size}_{embedding_size}_{num_RNN_layers}` so that the generated files are easier to maintain.
 
 9.  Run job `sbatch {rnn_type}_{attention/no_attention}_vi2en.s`
 	* You can check on the job by `squeue -u <netid>`

@@ -125,6 +125,9 @@ def main():
 	elif parser.optimizer == 'adam':
 		encoder_optimizer = optim.Adam(encoder_w_att.parameters(), lr = 5e-3)
 		decoder_optimizer = optim.Adam(decoder_wo_att.parameters(), lr = 5e-3)
+	else:
+		raise ValueError('Invalid optimizer!')
+
 
 	# instantiate scheduler
 	enc_scheduler = ReduceLROnPlateau(encoder_optimizer, min_lr=1e-4, factor = 0.5, patience=0)
@@ -147,7 +150,7 @@ def main():
 		log.info("Check if encoder path exists: {}".format(utils.get_full_filepath(saved_models_dir, encoder_save)))
 		log.info("Check if decoder path exists: {}".format(utils.get_full_filepath(saved_models_dir, decoder_save)))
 		log.info("Encoder and Decoder do not exist! Starting to train...")
-		train_utilities.train_model(encoder_optimizer, decoder_optimizer, encoder_w_att, decoder_w_att, criterion, "attention", dataloader, en_lang, vi_lang, saved_models_dir, encoder_save, decoder_save, num_epochs = num_epochs, rm = 0.95, enc_scheduler = enc_scheduler, dec_scheduler = dec_scheduler)
+		encoder_w_att, decoder_w_att, loss_hist, acc_hist = train_utilities.train_model(encoder_optimizer, decoder_optimizer, encoder_w_att, decoder_w_att, criterion, "attention", dataloader, en_lang, vi_lang, saved_models_dir, encoder_save, decoder_save, num_epochs = num_epochs, rm = 0.95, enc_scheduler = enc_scheduler, dec_scheduler = dec_scheduler)
 		log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
 		log.info("We will save the encoder/decoder in this directory: {}".format(saved_models_dir))
 

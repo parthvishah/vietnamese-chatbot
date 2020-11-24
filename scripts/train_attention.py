@@ -157,12 +157,12 @@ def main():
 
 
 	# BLEU with beam size
-	bleu_no_unk, att_score_wo, pred_wo, src_wo = train_utils.validation_beam_search(encoder_w_att, decoder_w_att, dataloader['validate'], en_lang, vi_lang, 'attention', beam_size, verbose = False)
+	bleu_no_unk, att_score_wo, pred_wo, src_wo = train_utilities.validation_beam_search(encoder_w_att, decoder_w_att, dataloader['validate'], en_lang, vi_lang, 'attention', beam_size, verbose = False)
 
 	log.info("Bleu-{} Score (No UNK): {}".format(beam_size, bleu_no_unk))
 	print("Bleu-{} Score (No UNK): {}".format(beam_size, bleu_no_unk))
 
-	bleu_unk, att_score_wo, pred_wo, src_wo = train_utils.validation_beam_search(encoder_wo_att, decoder_wo_att,dataloader['validate'], en_lang, vi_lang, 'no_attention', beam_size, verbose = False, replace_unk = True)
+	bleu_unk, att_score_wo, pred_wo, src_wo = train_utilities.validation_beam_search(encoder_wo_att, decoder_wo_att,dataloader['validate'], en_lang, vi_lang, 'no_attention', beam_size, verbose = False, replace_unk = True)
 
 	log.info("Bleu-{} Score (UNK): {}".format(beam_size, bleu_unk))
 	print("Bleu-{} Score (UNK): {}".format(beam_size, bleu_unk))

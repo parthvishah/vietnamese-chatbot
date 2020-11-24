@@ -43,6 +43,7 @@ def main():
 
 	# set device to CPU if available
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+	print("Starting experiment {} VN -> EN NMT on {}.".format(parser.experiment,device))
 	log.info("Starting experiment {} VN -> EN NMT on {}.".format(parser.experiment,device))
 
 	# set seed for replication

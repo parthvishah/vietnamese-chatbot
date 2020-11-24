@@ -273,14 +273,15 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 	'''
 	best_score = 0
 	best_bleu = 0
-	loss_hist = {'train': [], 'val_train': []}
+	loss_hist = {'train': [], 'validate': []}
 	bleu_hist = {'train': [], 'validate': []}
 	best_encoder_wts = None
 	best_decoder_wts = None
-	phases = ['train','val_train']
+	phases = ['train','validate']
 	for epoch in range(num_epochs):
 		start = time.time()
 		print('Epoch: [{}/{}]'.format(epoch, num_epochs));
+		log.info('Epoch: [{}/{}]'.format(epoch, num_epochs))
 		for ex, phase in enumerate(phases):
 			total = 0
 			top1_correct = 0
@@ -327,6 +328,7 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 		if (enc_scheduler is not None) and (dec_scheduler is not None):
 			enc_scheduler.step(loss_hist['train'][-1])
 			dec_scheduler.step(loss_hist['train'][-1])
+
 		if epoch%val_every == 0:
 			val_bleu_score, _, _ , _ = val_fn(encoder, decoder, dataloader['validate'], en_lang, vi_lang, m_type, verbose=False, replace_unk=True)
 			bleu_hist['validate'].append(val_bleu_score)

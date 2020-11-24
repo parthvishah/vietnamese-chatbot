@@ -36,7 +36,7 @@ def get_full_filepath(path, filename):
 	filename = filename+".pth"
 	return os.path.join(path, filename)
 
-def save_models(model, path, fiilename):
+def save_models(model, path, filename):
 	'''
 	save the model
 	'''

@@ -59,10 +59,7 @@ def convert_id_list_2_sent(list_idx, lang_obj):
 				word_list.append(lang_obj.index2word[i.item()])
 	return (' ').join(word_list)
 
-
-def validation_new(encoder, decoder, val_dataloader, lang_en, lang_vi, m_type, verbose = False, replace_unk = False):
-	'''
-	'''
+def validation_new(encoder, decoder, val_dataloader, lang_en,lang_vi,m_type, verbose = False, replace_unk = False):
 	encoder.eval()
 	decoder.eval()
 	pred_corpus = []
@@ -85,7 +82,7 @@ def validation_new(encoder, decoder, val_dataloader, lang_en, lang_vi, m_type, v
 		d_out = []
 		attention_scores = []
 		for i in range(sl*2):
-			out_vocab, prev_output, prev_hiddens, prev_cs, attention_score = decoder(decoder_input, prev_output, prev_hiddens, prev_cs, en_out, src_len)
+			out_vocab, prev_output,prev_hiddens, prev_cs, attention_score = decoder(decoder_input, prev_output, prev_hiddens, prev_cs, en_out, src_len)
 			topv, topi = out_vocab.topk(1)
 			d_out.append(topi.item())
 			decoder_input = topi.squeeze().detach().view(-1,1)
@@ -93,12 +90,11 @@ def validation_new(encoder, decoder, val_dataloader, lang_en, lang_vi, m_type, v
 				attention_scores.append(attention_score.unsqueeze(-1))
 			if topi.item() == EOS_token:
 				break
-
-			if replace_unk:
-				true_sent = convert_id_list_2_sent(data[1][0],lang_en)
-				true_corpus.append(true_sent)
-			else:
-				true_corpus.append(data[-1])
+		if replace_unk:
+			true_sent = convert_id_list_2_sent(data[1][0],lang_en)
+			true_corpus.append(true_sent)
+		else:
+			true_corpus.append(data[-1])
 		src_sent = convert_id_list_2_sent(data[0][0],lang_vi)
 		src_corpus.append(src_sent)
 		pred_sent = convert_id_list_2_sent(d_out,lang_en)
@@ -112,6 +108,7 @@ def validation_new(encoder, decoder, val_dataloader, lang_en, lang_vi, m_type, v
 			print('-*'*50)
 	score = bl.corpus_bleu(pred_corpus,[true_corpus],lowercase=True)[0]
 	return score, attention_scores_for_all_val, pred_corpus, src_corpus
+
 
 
 def validation_beam_search(encoder, decoder, val_dataloader,lang_en, lang_vi,m_type, beam_size, verbose = False, device = 'cuda', replace_unk = False):

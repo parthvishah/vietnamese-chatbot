@@ -142,18 +142,10 @@ def main():
 	encoder_save = '{}_att_{}_enc_{}_layer'.format(rnn_type, parser.optimizer, enc_layers)
 	decoder_save = '{}_att_{}_dec_{}_layer'.format(rnn_type, parser.optimizer, dec_layers)
 
-	if os.path.exists(utils.get_full_filepath(saved_models_dir, encoder_save)) and os.path.exists(utils.get_full_filepath(saved_models_dir, decoder_save)) and (not train_again):
-		log.info("Retrieving saved encoder from {}".format(utils.get_full_filepath(saved_models_dir, encoder_save)))
-		log.info("Retrieving saved decoder from {}".format(utils.get_full_filepath(saved_models_dir, decoder_save)))
-		encoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, encoder_save)))
-		decoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, encoder_save)))
-	else:
-		log.info("Check if encoder path exists: {}".format(utils.get_full_filepath(saved_models_dir, encoder_save)))
-		log.info("Check if decoder path exists: {}".format(utils.get_full_filepath(saved_models_dir, decoder_save)))
-		log.info("Encoder and Decoder do not exist! Starting to train...")
-		encoder_w_att, decoder_w_att, loss_hist, acc_hist = train_utilities.train_model(encoder_optimizer, decoder_optimizer, encoder_w_att, decoder_w_att, criterion, "attention", dataloader, en_lang, vi_lang, saved_models_dir, encoder_save, decoder_save, num_epochs = num_epochs, rm = 0.95, enc_scheduler = enc_scheduler, dec_scheduler = dec_scheduler)
-		log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
-		log.info("We will save the encoder/decoder in this directory: {}".format(saved_models_dir))
+
+	encoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, encoder_save)))
+	decoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, encoder_save)))
+
 
 
 	# BLEU with beam size

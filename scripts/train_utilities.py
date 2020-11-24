@@ -303,7 +303,7 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 				decoder_i = data[1].to(device)
 				src_len = data[2].to(device)
 				tar_len = data[3].to(device)
-				if phase == 'val_train':
+				if phase == 'validate':
 					out = enc_dec_fn(encoder, decoder, encoder_i, decoder_i, src_len, tar_len, rand_num=rm, val = True)
 				else:
 					out = enc_dec_fn(encoder, decoder, encoder_i, decoder_i, src_len, tar_len, rand_num=rm, val = False)

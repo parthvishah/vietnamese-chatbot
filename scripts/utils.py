@@ -36,13 +36,13 @@ def get_full_filepath(path, filename):
 	filename = filename+".pth"
 	return os.path.join(path, filename)
 
-def save_models(model, path, nn_type):
+def save_models(model, path, fiilename):
 	'''
 	save the model
 	'''
 	if not os.path.exists(path):
 		os.makedirs(path)
-	filename = "lstm_w_att_"+nn_type+".pth"
+	filename = filename+".pth"
 	torch.save(model, os.path.join(path, filename))
 
 def get_binned_bl_score(encoder, decoder, val_dataset, attn_flag, beam_size, location, min_len = 0, max_len = 30):

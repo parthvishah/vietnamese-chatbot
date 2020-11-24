@@ -276,10 +276,10 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 	best_decoder_wts = None
 	phases = ['train','validate']
 	for epoch in range(num_epochs):
-		start = time.time()
 		print('Epoch: [{}/{}]'.format(epoch, num_epochs));
 		log.info('Epoch: [{}/{}]'.format(epoch, num_epochs))
 		for ex, phase in enumerate(phases):
+			start = time.time()
 			total = 0
 			top1_correct = 0
 			running_loss = 0
@@ -304,9 +304,9 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 					out = enc_dec_fn(encoder, decoder, encoder_i, decoder_i, src_len, tar_len, rand_num=rm, val = True)
 				else:
 					out = enc_dec_fn(encoder, decoder, encoder_i, decoder_i, src_len, tar_len, rand_num=rm, val = False)
-					N = decoder_i.size(0)
-					loss = loss_fun(out.float(), decoder_i.long())
-					running_loss += loss.item() * N
+				N = decoder_i.size(0)
+				loss = loss_fun(out.float(), decoder_i.long())
+				running_loss += loss.item() * N
 
 				total += N
 				if phase == 'train':
@@ -318,8 +318,8 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 
 			epoch_loss = running_loss / total
 			loss_hist[phase].append(epoch_loss)
-
 			print("epoch {} {} loss = {}, time = {}".format(epoch, phase, epoch_loss, time.time() - start))
+			log.info("epoch {} {} loss = {}, time = {}".format(epoch, phase, epoch_loss, time.time() - start))
 
 
 		if (enc_scheduler is not None) and (dec_scheduler is not None):
@@ -329,8 +329,8 @@ def train_model(encoder_optimizer, decoder_optimizer, encoder, decoder, loss_fun
 		if epoch%val_every == 0:
 			val_bleu_score, _, _ , _ = val_fn(encoder, decoder, dataloader['validate'], en_lang, vi_lang, m_type, verbose=False, replace_unk=True)
 			bleu_hist['validate'].append(val_bleu_score)
-			print("validation BLEU = ", val_bleu_score)
-			log.info(f"epoch {epoch} | loss {epoch_loss} | time = {time.time() - start} | validation bleu = {val_bleu_score}")
+			print("validation BLEU = {}".format(val_bleu_score))
+			log.info("validation BLEU = {}".format(val_bleu_score))
 			if val_bleu_score > best_bleu:
 				best_bleu = val_bleu_score
 				best_encoder_wts = encoder.state_dict()

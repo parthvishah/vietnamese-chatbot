@@ -29,11 +29,11 @@ This .py file contains the following functions:
 	get_encoded_batch(sentence, lang_obj, use_cuda)
 """
 
-def get_full_filepath(path, nn_type):
+def get_full_filepath(path, filename):
 	'''
 	get the full checkpoint file path
 	'''
-	filename = "lstm_w_att_"+nn_type+".pth"
+	filename = filename+".pth"
 	return os.path.join(path, filename)
 
 def save_models(model, path, nn_type):

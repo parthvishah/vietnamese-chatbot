@@ -146,7 +146,7 @@ def main():
 		log.info("Retrieving saved encoder from {}".format(utils.get_full_filepath(saved_models_dir, encoder_save)))
 		log.info("Retrieving saved decoder from {}".format(utils.get_full_filepath(saved_models_dir, decoder_save)))
 		encoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, encoder_save)))
-		decoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, encoder_save)))
+		decoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, decoder_save)))
 	else:
 		log.info("Check if encoder path exists: {}".format(utils.get_full_filepath(saved_models_dir, encoder_save)))
 		log.info("Check if decoder path exists: {}".format(utils.get_full_filepath(saved_models_dir, decoder_save)))

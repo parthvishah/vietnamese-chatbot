@@ -1,18 +1,18 @@
 Using Prince
 ==============================
 
-Instructions for running on New York University's Prince computer cluster.
+Instructions for setting up our working directory and running slurm jobs on New York University's Prince computer cluster.
 
 
 Setup
 ------------
 
 1. SSHing in
-	* (Within NYU) Login Node:  `ssh netid@prince.hpc.nyu.edu`
-	* (Outside NYU) Access Node: `ssh netid@gw.hpc.nyu.edu`
+	* (Within NYU) Login Node:  `ssh <netid>@prince.hpc.nyu.edu`
+	* (Outside NYU) Access Node: `ssh <netid>@gw.hpc.nyu.edu`
 	* If you are within NYU network, you can SSH directly into the Login Node, otherwise you should first SSH into the Access Node, and then into the Login Node
 
-2. Move to your scratch folder `cd /scratch/netid`
+2. Move to your scratch folder `cd /scratch/<netid>`
 
 3. Create nlp_project directory `mkdir nlp_project`
 
@@ -20,8 +20,9 @@ Setup
 	* `mkdir saved_models`
 	* `mkdir outputs`
 	* `mkdir log`
+	* `mkdir plots`
 
-5. Clone repository within nlp_project directory `git clone https://github.com/anhthyngo/vietnamese-chatbot.git`
+5. Clone repository within nlp_project directory `https://github.com/anhthyngo/nmt-vi-en.git`
 
 6. Perform the following commands
 	*  `module purge`
@@ -33,8 +34,16 @@ Setup
 
    `conda env create -f environment.yml`
 
-8. Once the environment is created and you are within the root project directory, create copy of `seq2seq_train_1gpu.s` to include your netid in the file name and within the file.
+8. When running sbatch jobs make sure you are within the sbatch directory (`/scratch/an3056/nlp_project/nmt-vi-en/sbatch`).
 
-9.  Run job `sbatch nmt_no_attention_1gpu_netid.s`
-	* You can check on the job by `squeue -u netid`
+9. Create a copy of `lstm_attention_vi2en.s` and rename it as `{rnn_type}_{attention/no_attention}_vi2en.s` based on what configuration you are running. You will need to also change the hyperparameters and other arguments to your netid within the file. 
+
+10. Make sure the `STUDY_NAME` argument is in the following format {attn/no_attn}_{rnn_type}_{batch_size}_{embedding_size}_{num_RNN_layers} so that the generated files are easier to maintain.
+
+9.  Run job `sbatch {rnn_type}_{attention/no_attention}_vi2en.s`
+	* You can check on the job by `squeue -u <netid>`
+	* You can kill a running job by `scancel jobid`
+	* You can cancel all of your jobs by `scancel -u <netid>`
+
+10. If you need to rerun a configuration over again, you may need to delete generated files such as `lang_obj.pkl` and the encoder/decoder weight files in `/scratch/<netid>/nlp_project/saved_models/vi2en`.
 

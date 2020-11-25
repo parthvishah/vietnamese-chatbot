@@ -48,5 +48,6 @@ Setup
 10. Once you finish running update hyperparameter [Google Sheet](https://docs.google.com/spreadsheets/d/17Gmigor8gIXrwgxhAuVts7bhGkdZGLzN/edit#gid=1326021515) and add encoder/decoder weight files to [Google Drive](https://drive.google.com/drive/u/0/folders/1reFFZ5VxGtgoC7akPQcWRlZEkEiKD91I).
 	* Create a folder with the same naming convention in Step 9 and 10, and add weight files inside.
 	* Also add the generated png plot in the `plots` dir.
+	* Also add your sbatch script used to run job.
 	
 

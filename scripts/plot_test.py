@@ -139,13 +139,12 @@ def main():
 
 	# do we want to train again?
 	train_again = False
-	encoder_save = '{}_att_{}_enc_{}_layer'.format(rnn_type, parser.optimizer, enc_layers)
-	decoder_save = '{}_att_{}_dec_{}_layer'.format(rnn_type, parser.optimizer, dec_layers)
+	encoder_save = '{}_att_{}bs_{}_enc_{}_layer'.format(rnn_type, bs, parser.optimizer, enc_layers)
+	decoder_save = '{}_att_{}bs_{}_dec_{}_layer'.format(rnn_type, bs, parser.optimizer, dec_layers)
 
 
 	encoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, encoder_save)))
-	decoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, encoder_save)))
-
+	decoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, decoder_save)))
 
 
 	# BLEU with beam size
@@ -154,7 +153,7 @@ def main():
 	log.info("Bleu-{} Score (No UNK): {}".format(beam_size, bleu_no_unk))
 	print("Bleu-{} Score (No UNK): {}".format(beam_size, bleu_no_unk))
 
-	bleu_unk, att_score_wo, pred_wo, src_wo = train_utilities.validation_beam_search(encoder_wo_att, decoder_wo_att,dataloader['validate'], en_lang, vi_lang, 'no_attention', beam_size, verbose = False, replace_unk = True)
+	bleu_unk, att_score_wo, pred_wo, src_wo = train_utilities.validation_beam_search(encoder_w_att, decoder_w_att,dataloader['validate'], en_lang, vi_lang, 'attention', beam_size, verbose = False, replace_unk = True)
 
 	log.info("Bleu-{} Score (UNK): {}".format(beam_size, bleu_unk))
 	print("Bleu-{} Score (UNK): {}".format(beam_size, bleu_unk))
@@ -166,8 +165,8 @@ def main():
 		log.info('Source: {} \nPrediction: {}\n---'.format(src_wo[i], pred_wo[i]))
 
 	log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
-	_, _, fig = utils.get_binned_bl_score(encoder, decoder, transformed_dataset['validate'], attn_flag, beam_size, plots_dir)
+	_, _, fig = utils.get_binned_bl_score(ncoder_w_att, decoder_w_att, transformed_dataset['validate'], attn_flag, beam_size, plots_dir)
 
 
 if __name__ == "__main__":
-    main()
+	main()

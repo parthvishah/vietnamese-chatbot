@@ -57,7 +57,7 @@ def get_binned_bl_score(encoder, decoder, val_dataset, attn_flag, beam_size, loc
 	# intiate bleu score list
 	bin_bl_score = np.zeros(len(len_threshold))
 
-	for i in notebook.tqdm(range(1, len(len_threshold)), total = len(len_threshold)-1):
+	for i in range(1, len(len_threshold)):
 		# set lower and upper bound buckets
 		lower_bound = len_threshold[i-1]
 		upper_bound = len_threshold[i]

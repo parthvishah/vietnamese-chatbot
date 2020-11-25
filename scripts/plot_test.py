@@ -168,7 +168,7 @@ def main():
 		log.info('Source: {} \nPrediction: {}\n---'.format(src_wo[i], pred_wo[i]))
 
 	log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
-	_, _, fig = utils.get_binned_bl_score(ncoder_w_att, decoder_w_att, transformed_dataset['validate'], attn_flag, beam_size, plots_dir)
+	_, _, fig = utils.get_binned_bl_score(encoder_w_att, decoder_w_att, transformed_dataset['validate'], attn_flag, beam_size, plots_dir)
 
 
 if __name__ == "__main__":

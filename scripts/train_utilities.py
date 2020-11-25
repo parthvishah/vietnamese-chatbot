@@ -109,11 +109,7 @@ def validation_new(encoder, decoder, val_dataloader, lang_en,lang_vi,m_type, ver
 	score = bl.corpus_bleu(pred_corpus,[true_corpus],lowercase=True)[0]
 	return score, attention_scores_for_all_val, pred_corpus, src_corpus
 
-
-
-def validation_beam_search(encoder, decoder, val_dataloader,lang_en, lang_vi,m_type, beam_size, verbose = False, device = 'cuda', replace_unk = False):
-	'''
-	'''
+def validation_beam_search(encoder, decoder, val_dataloader,lang_en,lang_vi,m_type, beam_size, verbose = False, device = 'cuda', replace_unk = False):
 	encoder.eval()
 	decoder.eval()
 	encoder = encoder.to(device)
@@ -129,6 +125,7 @@ def validation_beam_search(encoder, decoder, val_dataloader,lang_en, lang_vi,m_t
 	for data in val_dataloader:
 		encoder_i = data[0].to(device)
 		src_len = data[2].to(device)
+
 		bs,sl = encoder_i.size()[:2]
 		en_out,en_hid,en_c = encoder(encoder_i,src_len)
 		max_src_len_batch = max(src_len).item()
@@ -136,6 +133,7 @@ def validation_beam_search(encoder, decoder, val_dataloader,lang_en, lang_vi,m_t
 		prev_cs = en_c
 		decoder_input = torch.tensor([[SOS_token]]*bs).to(device)
 		prev_output = torch.zeros((bs, en_out.size(-1))).to(device)
+
 		list_decoder_input = [None]*beam_size
 		beam_stop_flags = [False]*beam_size
 		beam_score = torch.zeros((bs,beam_size)).to(device)
@@ -144,7 +142,7 @@ def validation_beam_search(encoder, decoder, val_dataloader,lang_en, lang_vi,m_t
 		attention_scores = [[] for _ in range(beam_size)]
 		for i in range(sl+20):
 			if i == 0:
-				out_vocab, prev_output,prev_hiddens, prev_cs, attention_score = decoder(decoder_input, prev_output, prev_hiddens, prev_cs, en_out, src_len)
+				out_vocab, prev_output,prev_hiddens, prev_cs, attention_score = decoder(decoder_input,prev_output, prev_hiddens, prev_cs, en_out, src_len)
 				bss, vocab_size = out_vocab.size()
 				topv, topi = out_vocab.topk(beam_size)
 				list_prev_output = [prev_output]*beam_size
@@ -182,8 +180,8 @@ def validation_beam_search(encoder, decoder, val_dataloader,lang_en, lang_vi,m_t
 						list_decoder_input[b] = topi_idx[0][b].squeeze().detach().view(-1,1)
 						list_d_outs[b] = copy.deepcopy(prev_d_outs[id_for_hid[0][b]])
 						list_d_outs[b].append(topi_idx[0][b].item())
-					if m_type == 'attention':
-						attention_scores[b].append(temp_attention_score[b].unsqueeze(-1))
+						if m_type == 'attention':
+							attention_scores[b].append(temp_attention_score[b].unsqueeze(-1))
 						if topi_idx[0][b].item() == EOS_token:
 							beam_stop_flags[b] = True
 						else:
@@ -196,6 +194,7 @@ def validation_beam_search(encoder, decoder, val_dataloader,lang_en, lang_vi,m_t
 		id_max_score = torch.argmax(beam_score)
 		d_out = list_d_outs[id_max_score]
 		if m_type == 'attention':
+
 			att_score = attention_scores[id_max_score]
 			att_score = torch.cat(att_score, dim = -1)
 			attention_scores_for_all_val.append(att_score)
@@ -212,9 +211,9 @@ def validation_beam_search(encoder, decoder, val_dataloader,lang_en, lang_vi,m_t
 			print("True Sentence:",data[-1])
 			print("Pred Sentence:", pred_sent)
 			print('-*'*50)
+
 	score = bl.corpus_bleu(pred_corpus,[true_corpus],lowercase=True)[0]
 	return score, attention_scores_for_all_val, pred_corpus, src_corpus
-
 
 def encode_decode(encoder, decoder, data_en, data_de, src_len, tar_len, rand_num = 0.95, val = False):
 	if not val:

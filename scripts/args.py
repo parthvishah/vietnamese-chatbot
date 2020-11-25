@@ -20,9 +20,9 @@ args.add_argument('--save_dir',
                   default='results',
                   help='directory to save results')
 args.add_argument('--plots_dir',
-                  type=str,
-                  default='plot',
-                  help='directory to save results')
+                   type=str,
+                   default='plot',
+                   help='directory to save results')
 args.add_argument('--seed',
                   type=int,
                   default=42,
@@ -47,10 +47,10 @@ args.add_argument('--batch_size',
 					type=int,
 					default=8,
 					help='batch size')
-args.add_argument('--longest_label',
-					type=int,
-					default=1,
-					help='longest label')
+# args.add_argument('--longest_label',
+# 					type=int,
+# 					default=1,
+# 					help='longest label')
 args.add_argument('--source_name',
 					type=str,
 					default='vi',
@@ -71,28 +71,62 @@ args.add_argument('--logging_steps',
 					type=int,
 					default=1e4,
 					help='logs best weights every X update steps for experiment')
-args.add_argument('--hidden_size',
+args.add_argument('--optimizer',
+					type=str,
+					default='sgd',
+					help='specify what type of optimizer to use for training ("sgd","adam")')
+# args.add_argument('--hidden_size',
+# 					type=int,
+# 					default=512,
+# 					help='hidden size of RNN')
+args.add_argument('--enc_emb',
 					type=int,
 					default=512,
-					help='hidden size of RNN')
-args.add_argument('--rnn_layers',
+					help='encoder embedding dim')
+args.add_argument('--enc_hidden',
+					type=int,
+					default=512,
+					help='encoder hidden size')
+args.add_argument('--enc_layers',
 					type=int,
 					default=1,
-					help='num layers of RNN')
-args.add_argument('--gradient_clip',
-					type=float,
-					default=0.3,
-					help='num layers of RNN')
+					help='encoder num layers')
+args.add_argument('--rnn_type',
+					type=str,
+					default='lstm',
+					help='rnn type (lstm or gru)')
+args.add_argument('--dec_emb',
+					type=int,
+					default=512,
+					help='decoder embedding dim')
+args.add_argument('--dec_hidden',
+					type=int,
+					default=1024,
+					help='decoder hidden size')
+args.add_argument('--dec_layers',
+					type=int,
+					default=1,
+					help='decoder num layers')
+# args.add_argument('--rnn_layers',
+# 					type=int,
+# 					default=1,
+# 					help='num layers of RNN')
+# args.add_argument('--gradient_clip',
+# 					type=float,
+# 					default=0.3,
+# 					help='num layers of RNN')
 args.add_argument('--epochs',
 					type=int,
 					default=10,
 					help='number of epochs')
-args.add_argument('--encoder_attention',
-					action='store_false',
-					help='with encoder attention')
-args.add_argument('--self_attention',
-					action='store_true',
-					help='with self-attention')
+args.add_argument('--attn',
+ 					action='store_true',
+ 					help='with encoder attention')
+args.add_argument('--beam_size',
+ 					type=int,
+					default=3,
+ 					help='beam size for eval')
+
 
 
 def check_args(parser):

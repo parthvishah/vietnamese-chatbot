@@ -5,7 +5,11 @@ Main run script to execute NMT evaluation
 import os
 import time
 import torch
+from torch import optim
+import torch.nn as nn
+import torch.nn.functional as F
 from torch.utils.data import DataLoader
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from functools import partial
 import sys
 import logging as log
@@ -16,8 +20,10 @@ import numpy as np
 
 # =============== Self Defined ===============
 import global_variables
-import nmt_dataset
-import nnet_models_new
+import dataset_helper
+import nnet_models
+import train_utilities
+import bleu_score
 import utils
 from args import args, check_args
 
@@ -35,10 +41,9 @@ def main():
 	log.basicConfig(filename=log_name, format='%(asctime)s | %(name)s -- %(message)s', level=log.INFO)
 	os.chmod(log_name, parser.access_mode)
 
-
-
-	# set devise to CPU if available
+	# set device to CPU if available
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+	print("Starting experiment {} VN -> EN NMT on {}.".format(parser.experiment,device))
 	log.info("Starting experiment {} VN -> EN NMT on {}.".format(parser.experiment,device))
 
 	# set seed for replication
@@ -63,78 +68,114 @@ def main():
 
 	# get data dir
 	main_data_path = parser.data_dir
-	path_to_train_data = {'source':main_data_path+'train.'+source_name, 'target':main_data_path+'train.'+target_name}
-	path_to_dev_data = {'source': main_data_path+'dev.'+source_name, 'target':main_data_path+'dev.'+target_name}
-	# get language objects
-	saved_language_model_dir = os.path.join(saved_models_dir, 'lang_obj')
-
-	# get dictionary of datasets
-	dataset_dict = {'train': nmt_dataset.LanguagePair(source_name = source_name, target_name=target_name, filepath = path_to_train_data, lang_obj_path = saved_language_model_dir, minimum_count = 1), 'dev': nmt_dataset.LanguagePair(source_name = source_name, target_name=target_name, filepath = path_to_dev_data, lang_obj_path = saved_language_model_dir, minimum_count = 1)}
-
-	# get max sentence length by 99% percentile
-	MAX_LEN = int(dataset_dict['train'].main_df['source_len'].quantile(0.9999))
-	batchSize = parser.batch_size
-	log.info("Batch size = {}.".format(batchSize))
-
-	dataloader_dict = {'train': DataLoader(dataset_dict['train'], batch_size = batchSize, collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=MAX_LEN), shuffle = True, num_workers=0), 'dev': DataLoader(dataset_dict['dev'], batch_size = batchSize, collate_fn = partial(nmt_dataset.vocab_collate_func, MAX_LEN=MAX_LEN), shuffle = True, num_workers=0)}
+	path_to_train_data = {'source':main_data_path+'train.tok.'+source_name, 'target':main_data_path+'train.tok.'+target_name}
+	path_to_dev_data = {'source': main_data_path+'dev.tok.'+source_name, 'target':main_data_path+'dev.tok.'+target_name}
+	path_to_test_data = {'source': main_data_path+'test.tok.'+source_name, 'target':main_data_path+'test.tok.'+target_name}
 
 	# Configuration
-	source_lang_obj = dataset_dict['train'].source_lang_obj
-	target_lang_obj = dataset_dict['train'].target_lang_obj
+	bs = parser.batch_size
+	log.info("Batch size = {}.".format(bs))
 
-	source_vocab = dataset_dict['train'].source_lang_obj.n_words;
-	target_vocab = dataset_dict['train'].target_lang_obj.n_words;
-	hidden_size = parser.hidden_size
-	rnn_layers = parser.rnn_layers
-	lr = parser.learning_rate
-	longest_label = parser.longest_label
-	gradient_clip = parser.gradient_clip
+	enc_emb = parser.enc_emb
+	enc_hidden = parser.enc_hidden
+	enc_layers = parser.enc_layers
+	rnn_type = parser.rnn_type
+
+	dec_emb = parser.dec_emb
+	dec_hidden = parser.dec_hidden
+	dec_layers = parser.dec_layers
+
+	learning_rate = parser.learning_rate
 	num_epochs = parser.epochs
-	encoder_attention = parser.encoder_attention
-	self_attention = parser.self_attention
+	attn_flag = parser.attn
+	log.info("The attention flag is set to {}.".format(attn_flag))
+	beam_size = parser.beam_size
+	log.info("We evaluate using beam size of {}.".format(beam_size))
 
-	log.info("encoder_attention = {}, self_attention = {}".format(encoder_attention, self_attention))
+	train, val, test, en_lang, vi_lang = dataset_helper.train_val_load("", main_data_path)
 
-	# encoder model
-	encoder_encoderattn = nnet_models_new.EncoderRNN(input_size = source_vocab, hidden_size = hidden_size, numlayers = rnn_layers)
+	# get vocab sizes
+	log.info('English has vocab size of: {} words.'.format(en_lang.n_words))
+	log.info('Vietnamese has vocab size of: {} words.'.format(vi_lang.n_words))
 
-	# decoder model
-	decoder_encoderattn = nnet_models_new.Decoder_SelfAttn(output_size = target_vocab, hidden_size = hidden_size, encoder_attention = encoder_attention, self_attention = self_attention)
+	# get max sentence length by 95% percentile
+	MAX_LEN = int(train['en_len'].quantile(0.95))
+	log.info('We will have a max sentence length of {} (95 percentile).'.format(MAX_LEN))
 
-	# seq2seq model
-	nmt_encoderattn = nnet_models_new.seq2seq(encoder_encoderattn, decoder_encoderattn, lr = lr, hiddensize = hidden_size, numlayers = hidden_size, target_lang=dataset_dict['train'].target_lang_obj, longest_label = longest_label, clip = gradient_clip, device = device)
+	# set data loaders
+	bs_dict = {'train':bs, 'validate':1, 'test':1}
+	shuffle_dict = {'train':True, 'validate':False, 'test':False}
 
-	log.info("Seq2Seq Model with the following parameters: encoder_attention = {}, self_attention = {}, batch_size = {}, learning_rate = {}, hidden_size = {}, rnn_layers = {}, lr = {}, longest_label = {}, gradient_clip = {}, num_epochs = {}, source_name = {}, target_name = {}".format(encoder_attention, self_attention, batchSize, lr, hidden_size, rnn_layers, lr, longest_label, gradient_clip, num_epochs, source_name, target_name))
+	train_used = train
+	val_used = val
+
+	collate_fn_dict = {'train':partial(dataset_helper.vocab_collate_func, MAX_LEN = MAX_LEN), 'validate':dataset_helper.vocab_collate_func_val, 'test': dataset_helper.vocab_collate_func_val}
+
+	transformed_dataset = {'train': dataset_helper.Vietnamese(train_used), 'validate': dataset_helper.Vietnamese(val_used, val = True), 'test':dataset_helper.Vietnamese(test, val= True)}
+
+	dataloader = {x: DataLoader(transformed_dataset[x], batch_size=bs_dict[x], collate_fn=collate_fn_dict[x], shuffle=shuffle_dict[x], num_workers=0) for x in ['train', 'validate', 'test']}
+
+	# instantiate encoder/decoder
+	encoder_w_att = nnet_models.EncoderRNN(input_size = vi_lang.n_words, embed_dim = enc_emb, hidden_size = enc_hidden, n_layers=enc_layers, rnn_type=rnn_type).to(device)
+	decoder_w_att = nnet_models.AttentionDecoderRNN(output_size = en_lang.n_words, embed_dim = dec_emb, hidden_size = dec_hidden, n_layers = dec_layers, attention = attn_flag).to(device)
+
+	# instantiate optimizer
+	if parser.optimizer == 'sgd':
+		encoder_optimizer = optim.SGD(encoder_w_att.parameters(), lr = learning_rate, nesterov = True, momentum = 0.99)
+		decoder_optimizer = optim.SGD(decoder_w_att.parameters(), lr = learning_rate,nesterov = True, momentum = 0.99)
+	elif parser.optimizer == 'adam':
+		encoder_optimizer = optim.Adam(encoder_w_att.parameters(), lr = 5e-3)
+		decoder_optimizer = optim.Adam(decoder_wo_att.parameters(), lr = 5e-3)
+	else:
+		raise ValueError('Invalid optimizer!')
+
+
+	# instantiate scheduler
+	enc_scheduler = ReduceLROnPlateau(encoder_optimizer, min_lr=1e-4, factor = 0.5, patience=0)
+	dec_scheduler = ReduceLROnPlateau(decoder_optimizer, min_lr=1e-4, factor = 0.5, patience=0)
+	criterion = nn.NLLLoss(ignore_index = global_variables.PAD_IDX)
+
+	log.info("Seq2Seq Model with the following parameters: batch_size = {}, learning_rate = {}, rnn_type = {}, enc_emb = {}, enc_hidden = {}, enc_layers = {}, dec_emb = {}, dec_hidden = {}, dec_layers = {}, num_epochs = {}, source_name = {}, target_name = {}".format(bs, learning_rate, rnn_type, enc_emb, enc_hidden, enc_layers, dec_emb, dec_hidden, dec_layers, num_epochs, source_name, target_name))
 
 	# do we want to train again?
 	train_again = False
-	modelname = 'encoderattn'
+	encoder_save = '{}_att_{}bs_{}hs_{}_{}beam_enc_{}_layer'.format(rnn_type, bs, enc_hidden, parser.optimizer, beam_size, enc_layers)
+	decoder_save = '{}_att_{}bs_{}hs_{}_{}beam_dec_{}_layer'.format(rnn_type, bs, enc_hidden, parser.optimizer, beam_size, dec_layers)
 
-	# check if there is a saved model and if we want to train again
-	if os.path.exists(utils.get_full_filepath(saved_models_dir, modelname)) and (not train_again):
-		log.info("Retrieving saved model from {}".format(utils.get_full_filepath(saved_models_dir, modelname)))
-		nmt_encoderattn = torch.load(utils.get_full_filepath(saved_models_dir, modelname))
-	# train model again
+	if os.path.exists(utils.get_full_filepath(saved_models_dir, encoder_save)) and os.path.exists(utils.get_full_filepath(saved_models_dir, decoder_save)) and (not train_again):
+		log.info("Retrieving saved encoder from {}".format(utils.get_full_filepath(saved_models_dir, encoder_save)))
+		log.info("Retrieving saved decoder from {}".format(utils.get_full_filepath(saved_models_dir, decoder_save)))
+		encoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, encoder_save)))
+		decoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, decoder_save)))
 	else:
-		log.info("Check if this path exists: {}".format(utils.get_full_filepath(saved_models_dir, modelname)))
-		log.info("It does not exist! Starting to train...")
-		utils.train_model(dataloader_dict, nmt_encoderattn, num_epochs = num_epochs, saved_model_path = saved_models_dir, enc_type = 'encoderattn_test')
-	log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
-	log.info("We will save the models in this directory: {}".format(saved_models_dir))
+		log.info("Check if encoder path exists: {}".format(utils.get_full_filepath(saved_models_dir, encoder_save)))
+		log.info("Check if decoder path exists: {}".format(utils.get_full_filepath(saved_models_dir, decoder_save)))
+		log.info("Encoder and Decoder do not exist! Starting to train...")
+		encoder_w_att, decoder_w_att, loss_hist, acc_hist = train_utilities.train_model(encoder_optimizer, decoder_optimizer, encoder_w_att, decoder_w_att, criterion, "attention", dataloader, en_lang, vi_lang, saved_models_dir, encoder_save, decoder_save, num_epochs = num_epochs, rm = 0.95, enc_scheduler = enc_scheduler, dec_scheduler = dec_scheduler)
+		log.info("Total time is: {} min : {} s".format((time.time()-start)//60, (time.time()-start)%60))
+		log.info("We will save the encoder/decoder in this directory: {}".format(saved_models_dir))
 
-	# generate translations
-	use_cuda = True
-	utils.get_translation(nmt_encoderattn, 'I love to watch science movies on Mondays', source_lang_obj, use_cuda, source_name, target_name)
-	utils.get_translation(nmt_encoderattn, 'I want to be the best friend that I can be', source_lang_obj, use_cuda, source_name, target_name)
-	utils.get_translation(nmt_encoderattn, 'I love you', source_lang_obj, use_cuda, source_name, target_name)
-	utils.get_translation(nmt_encoderattn, 'I love football, I like to watch it with my friends. It is always a great time.', source_lang_obj, use_cuda, source_name, target_name)
-	utils.get_translation(nmt_encoderattn, 'I do not know what I would do without pizza, it is very tasty to eat. If I could have any food in the world it would probably be pizza.', source_lang_obj, use_cuda, source_name, target_name)
-	utils.get_translation(nmt_encoderattn, 'Trump is the worst president in all of history. He can be a real racist and say very nasty things to people of color.', source_lang_obj, use_cuda, source_name, target_name)
-	utils.get_translation(nmt_encoderattn, 'Thank you very much.', source_lang_obj, use_cuda, source_name, target_name)
-	utils.get_translation(nmt_encoderattn, 'Think about your own choices.', source_lang_obj, use_cuda, source_name, target_name)
-	utils.get_translation(nmt_encoderattn, 'I recently did a survey with over 2,000 Americans , and the average number of choices that the typical American reports making is about 70 in a typical day .', source_lang_obj, use_cuda, source_name, target_name)
-	# export plot
-	_, _, fig = utils.get_binned_bl_score(nmt_encoderattn, dataset_dict['dev'], plots_dir, batchSize = batchSize)
+
+	# BLEU with beam size
+	bleu_no_unk, att_score_wo, pred_wo, src_wo = train_utilities.validation_beam_search(encoder_w_att, decoder_w_att, dataloader['validate'], en_lang, vi_lang, 'attention', beam_size, verbose = False)
+
+	log.info("Bleu-{} Score (No UNK): {}".format(beam_size, bleu_no_unk))
+	print("Bleu-{} Score (No UNK): {}".format(beam_size, bleu_no_unk))
+
+	bleu_unk, att_score_wo, pred_wo, src_wo = train_utilities.validation_beam_search(encoder_w_att, decoder_w_att,dataloader['validate'], en_lang, vi_lang, 'attention', beam_size, verbose = False, replace_unk = True)
+
+	log.info("Bleu-{} Score (UNK): {}".format(beam_size, bleu_unk))
+	print("Bleu-{} Score (UNK): {}".format(beam_size, bleu_unk))
+
+	# generate 5 random predictions
+	indexes = range(len(pred_wo))
+	for i in np.random.choice(indexes, 5):
+		print('Source: {} \nPrediction: {}\n---'.format(src_wo[i], pred_wo[i]))
+		log.info('Source: {} \nPrediction: {}\n---'.format(src_wo[i], pred_wo[i]))
+
+	log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
+	_, _, fig = utils.get_binned_bl_score(encoder = encoder_w_att, decoder = decoder_w_att, val_dataset = transformed_dataset['validate'], attn_flag = attn_flag, beam_size = beam_size, location = plots_dir, collate = collate_fn_dict['validate'], lang_en = en_lang, lang_vi = vi_lang)
+
 
 if __name__ == "__main__":
-    main()
+	main()

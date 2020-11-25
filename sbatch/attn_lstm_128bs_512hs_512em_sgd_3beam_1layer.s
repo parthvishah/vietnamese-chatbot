@@ -43,6 +43,7 @@ DEC_LAYERS=1
 EPOCHS=15
 ATTN=TRUE
 BEAM_SIZE=3
+OPTIM=sgd
 
 
 cd ${PROJECT}
@@ -65,4 +66,5 @@ python ./nmt-vi-en/scripts/train_attention.py \
 	--dec_layers ${DEC_LAYERS} \
 	--epochs ${EPOCHS} \
 	--beam_size ${BEAM_SIZE} \
+	--optim ${OPTIM} \
 	--attn

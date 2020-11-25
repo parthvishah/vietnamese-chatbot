@@ -139,8 +139,8 @@ def main():
 
 	# do we want to train again?
 	train_again = False
-	encoder_save = '{}_att_{}_enc_{}_layer'.format(rnn_type, parser.optimizer, enc_layers)
-	decoder_save = '{}_att_{}_dec_{}_layer'.format(rnn_type, parser.optimizer, dec_layers)
+	encoder_save = '{}_att_{}bs_{}_enc_{}_layer'.format(rnn_type, bs, parser.optimizer, enc_layers)
+	decoder_save = '{}_att_{}bs_{}_dec_{}_layer'.format(rnn_type, bs, parser.optimizer, dec_layers)
 
 	if os.path.exists(utils.get_full_filepath(saved_models_dir, encoder_save)) and os.path.exists(utils.get_full_filepath(saved_models_dir, decoder_save)) and (not train_again):
 		log.info("Retrieving saved encoder from {}".format(utils.get_full_filepath(saved_models_dir, encoder_save)))

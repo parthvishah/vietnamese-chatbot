@@ -109,111 +109,119 @@ def validation_new(encoder, decoder, val_dataloader, lang_en,lang_vi,m_type, ver
 	score = bl.corpus_bleu(pred_corpus,[true_corpus],lowercase=True)[0]
 	return score, attention_scores_for_all_val, pred_corpus, src_corpus
 
-def validation_beam_search(encoder, decoder, val_dataloader,lang_en,lang_vi,m_type, beam_size, verbose = False, device = 'cuda', replace_unk = False):
-	encoder.eval()
-	decoder.eval()
-	encoder = encoder.to(device)
-	decoder = decoder.to(device)
-	pred_corpus = []
-	true_corpus = []
-	src_corpus = []
-	running_loss = 0
-	running_total = 0
-	bl = BLEU_SCORE()
-	j = 0
-	attention_scores_for_all_val = []
-	for data in val_dataloader:
-		encoder_i = data[0].to(device)
-		src_len = data[2].to(device)
 
-		bs,sl = encoder_i.size()[:2]
-		en_out,en_hid,en_c = encoder(encoder_i,src_len)
-		max_src_len_batch = max(src_len).item()
-		prev_hiddens = en_hid
-		prev_cs = en_c
-		decoder_input = torch.tensor([[SOS_token]]*bs).to(device)
-		prev_output = torch.zeros((bs, en_out.size(-1))).to(device)
 
-		list_decoder_input = [None]*beam_size
-		beam_stop_flags = [False]*beam_size
-		beam_score = torch.zeros((bs,beam_size)).to(device)
-		list_d_outs = [[] for _ in range(beam_size)]
-		select_beam_size = beam_size
-		attention_scores = [[] for _ in range(beam_size)]
-		for i in range(sl+20):
-			if i == 0:
-				out_vocab, prev_output,prev_hiddens, prev_cs, attention_score = decoder(decoder_input,prev_output, prev_hiddens, prev_cs, en_out, src_len)
-				bss, vocab_size = out_vocab.size()
-				topv, topi = out_vocab.topk(beam_size)
-				list_prev_output = [prev_output]*beam_size
-				list_prev_hiddens = [prev_hiddens]*beam_size
-				list_prev_cs = [prev_cs]*beam_size
-				for b in range(beam_size):
-					beam_score[0][b] = topv[0][b].item()
-					list_decoder_input[b] = topi[0][b].squeeze().detach().view(-1,1)
-					list_d_outs[b].append(topi[0][b].item())
-					if m_type == 'attention':
-						attention_scores[b].append(attention_score.unsqueeze(-1))
-					if topi[0][b].item() == EOS_token:
-						beam_stop_flags[b] = True
-			else:
-				beam_out_vocab = [None]*beam_size
-				temp_out = [None]*beam_size
-				temp_hid = [None]*beam_size
-				temp_c = [None]*beam_size
-				temp_attention_score = [[] for _ in range(beam_size)]
-				prev_d_outs = copy.deepcopy(list_d_outs)
-				for b in range(beam_size):
-					if not beam_stop_flags[b]:
-						beam_out_vocab[b], temp_out[b], temp_hid[b], temp_c[b], temp_attention_score[b] = decoder(list_decoder_input[b], list_prev_output[b], list_prev_hiddens[b], list_prev_cs[b], en_out, src_len)
-						beam_out_vocab[b] = beam_out_vocab[b] + beam_score[0][b]
-					if beam_stop_flags[b]:
-						beam_out_vocab[b] = torch.zeros(bss,vocab_size).fill_(float('-inf')).to(device)
-				beam_out_vocab = torch.cat(beam_out_vocab,dim = 1)
+def validation_beam_search(encoder, decoder, val_dataloader,lang_en,lang_vi,m_type, beam_size, verbose = False,\
+                           device = 'cuda', replace_unk = False):
+    encoder.eval()
+    decoder.eval()
+    encoder = encoder.to(device)
+    decoder = decoder.to(device)
+    pred_corpus = []
+    true_corpus = []
+    src_corpus = []
+    running_loss = 0
+    running_total = 0
+    bl = BLEU_SCORE()
+    j = 0
+    attention_scores_for_all_val = []
+    for data in val_dataloader:
+#         print(j)
+        encoder_i = data[0].to(device)
+        src_len = data[2].to(device)
 
-				topv, topi = beam_out_vocab.topk(beam_size)
-				id_for_hid = topi//vocab_size
-				topi_idx = topi%vocab_size
-				for b in range(beam_size):
-					if not beam_stop_flags[b]:
-						beam_score[0][b] = topv[0][b].item()
-						list_decoder_input[b] = topi_idx[0][b].squeeze().detach().view(-1,1)
-						list_d_outs[b] = copy.deepcopy(prev_d_outs[id_for_hid[0][b]])
-						list_d_outs[b].append(topi_idx[0][b].item())
-						if m_type == 'attention':
-							attention_scores[b].append(temp_attention_score[b].unsqueeze(-1))
-						if topi_idx[0][b].item() == EOS_token:
-							beam_stop_flags[b] = True
-						else:
-							list_prev_output[b] = temp_out[id_for_hid[0][b]]
-							list_prev_hiddens[b] = temp_hid[id_for_hid[0][b]]
-							list_prev_cs[b] = temp_c[id_for_hid[0][b]]
-				if all(beam_stop_flags):
-					break
+        bs,sl = encoder_i.size()[:2]
+        en_out,en_hid,en_c = encoder(encoder_i,src_len)
+        max_src_len_batch = max(src_len).item()
+        prev_hiddens = en_hid
+        prev_cs = en_c
+        decoder_input = torch.tensor([[SOS_token]]*bs).to(device)
+        prev_output = torch.zeros((bs, en_out.size(-1))).to(device)
 
-		id_max_score = torch.argmax(beam_score)
-		d_out = list_d_outs[id_max_score]
-		if m_type == 'attention':
+        list_decoder_input = [None]*beam_size
+        beam_stop_flags = [False]*beam_size
+        beam_score = torch.zeros((bs,beam_size)).to(device)
+        list_d_outs = [[] for _ in range(beam_size)]
+        select_beam_size = beam_size
+        attention_scores = [[] for _ in range(beam_size)]
+        for i in range(sl+20):
+            if i == 0:
+                out_vocab, prev_output,prev_hiddens, prev_cs, attention_score = decoder(decoder_input,prev_output, \
+                                                                                    prev_hiddens,prev_cs, en_out,\
+                                                                                    src_len)
+                bss, vocab_size = out_vocab.size()
+                topv, topi = out_vocab.topk(beam_size)
+                list_prev_output = [prev_output]*beam_size
+                list_prev_hiddens = [prev_hiddens]*beam_size
+                list_prev_cs = [prev_cs]*beam_size
+                for b in range(beam_size):
+                    beam_score[0][b] = topv[0][b].item()
+                    list_decoder_input[b] = topi[0][b].squeeze().detach().view(-1,1)
+                    list_d_outs[b].append(topi[0][b].item())
+                    if m_type == 'attention':
+                        attention_scores[b].append(attention_score.unsqueeze(-1))
+                    if topi[0][b].item() == EOS_token:
+                        beam_stop_flags[b] = True
+            else:
+                beam_out_vocab = [None]*beam_size
+                temp_out = [None]*beam_size
+                temp_hid = [None]*beam_size
+                temp_c = [None]*beam_size
+                temp_attention_score = [[] for _ in range(beam_size)]
+                prev_d_outs = copy.deepcopy(list_d_outs)
+                for b in range(beam_size):
+                    if not beam_stop_flags[b]:
+                        beam_out_vocab[b], temp_out[b], temp_hid[b], temp_c[b], temp_attention_score[b] =\
+                            decoder(list_decoder_input[b],list_prev_output[b],list_prev_hiddens[b],list_prev_cs[b],\
+                                    en_out,src_len)
+                        beam_out_vocab[b] = beam_out_vocab[b] + beam_score[0][b]
+                    if beam_stop_flags[b]:
+                        beam_out_vocab[b] = torch.zeros(bss,vocab_size).fill_(float('-inf')).to(device)
+                beam_out_vocab = torch.cat(beam_out_vocab,dim = 1)
 
-			att_score = attention_scores[id_max_score]
-			att_score = torch.cat(att_score, dim = -1)
-			attention_scores_for_all_val.append(att_score)
-		if replace_unk:
-			true_sent = convert_id_list_2_sent(data[1][0],lang_en)
-			true_corpus.append(true_sent)
-		else:
-			true_corpus.append(data[-1])
-		pred_sent = convert_id_list_2_sent(d_out,lang_en)
-		pred_corpus.append(pred_sent)
-		src_sent = convert_id_list_2_sent(data[0][0], lang_vi)
-		src_corpus.append(src_sent)
-		if verbose:
-			print("True Sentence:",data[-1])
-			print("Pred Sentence:", pred_sent)
-			print('-*'*50)
+                topv, topi = beam_out_vocab.topk(beam_size)
+                id_for_hid = topi//vocab_size
+                topi_idx = topi%vocab_size
+                for b in range(beam_size):
+                    if not beam_stop_flags[b]:
+                        beam_score[0][b] = topv[0][b].item()
+                        list_decoder_input[b] = topi_idx[0][b].squeeze().detach().view(-1,1)
+                        list_d_outs[b] = copy.deepcopy(prev_d_outs[id_for_hid[0][b]])
+                        list_d_outs[b].append(topi_idx[0][b].item())
+                        if m_type == 'attention':
+                            attention_scores[b].append(temp_attention_score[b].unsqueeze(-1))
+                        if topi_idx[0][b].item() == EOS_token:
+                            beam_stop_flags[b] = True
+                        else:
+                            list_prev_output[b] = temp_out[id_for_hid[0][b]]
+                            list_prev_hiddens[b] = temp_hid[id_for_hid[0][b]]
+                            list_prev_cs[b] = temp_c[id_for_hid[0][b]]
+                if all(beam_stop_flags):
+                    break
 
-	score = bl.corpus_bleu(pred_corpus,[true_corpus],lowercase=True)[0]
-	return score, attention_scores_for_all_val, pred_corpus, src_corpus
+        id_max_score = torch.argmax(beam_score)
+        d_out = list_d_outs[id_max_score]
+        if m_type == 'attention':
+
+            att_score = attention_scores[id_max_score]
+            att_score = torch.cat(att_score, dim = -1)
+            attention_scores_for_all_val.append(att_score)
+        if replace_unk:
+            true_sent = convert_id_list_2_sent(data[1][0],lang_en)
+            true_corpus.append(true_sent)
+        else:
+            true_corpus.append(data[-1])
+        pred_sent = convert_id_list_2_sent(d_out,lang_en)
+        pred_corpus.append(pred_sent)
+        src_sent = convert_id_list_2_sent(data[0][0], lang_vi)
+        src_corpus.append(src_sent)
+        if verbose:
+            print("True Sentence:",data[-1])
+            print("Pred Sentence:", pred_sent)
+            print('-*'*50)
+
+    score = bl.corpus_bleu(pred_corpus,[true_corpus],lowercase=True)[0]
+    return score, attention_scores_for_all_val, pred_corpus, src_corpus
 
 def encode_decode(encoder, decoder, data_en, data_de, src_len, tar_len, rand_num = 0.95, val = False):
 	if not val:

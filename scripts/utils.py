@@ -17,6 +17,7 @@ import matplotlib.ticker as ticker
 import global_variables
 import dataset_helper
 import nnet_models
+import train_utilities
 from args import args, check_args
 
 """
@@ -70,7 +71,7 @@ def get_binned_bl_score(encoder, decoder, val_dataset, attn_flag, beam_size, loc
 		temp_loader = DataLoader(temp_dataset, batch_size = 1, collate_fn = collate, shuffle = False, num_workers=0)
 
 		# evaluate
-		bin_bl_score[i], _, _, _ = validation_beam_search(encoder, decoder, temp_loader, en_lang, vi_lang, attn_str, beam_size, verbose = False)
+		bin_bl_score[i], _, _, _ = train_utilities.validation_beam_search(encoder, decoder, temp_loader, en_lang, vi_lang, attn_str, beam_size, verbose = False)
 
 	# plot bleu score vs. sent lengh
 	len_threshold = len_threshold[1:]

@@ -143,7 +143,7 @@ def main():
 	decoder_save = '{}_att_{}bs_{}_dec_{}_layer'.format(rnn_type, bs, parser.optimizer, dec_layers)
 
 	print(utils.get_full_filepath(saved_models_dir, encoder_save))
- 	print(utils.get_full_filepath(saved_models_dir, encoder_save))
+	print(utils.get_full_filepath(saved_models_dir, encoder_save))
 	log.info(utils.get_full_filepath(saved_models_dir, encoder_save))
  	log.info(utils.get_full_filepath(saved_models_dir, encoder_save))
 	encoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, encoder_save)))

@@ -45,7 +45,7 @@ def save_models(model, path, filename):
 	filename = filename+".pth"
 	torch.save(model, os.path.join(path, filename))
 
-def get_binned_bl_score(encoder, decoder, val_dataset, attn_flag, beam_size, location, min_len = 0, max_len = 30):
+def get_binned_bl_score(encoder, decoder, val_dataset, attn_flag, beam_size, location, collate, min_len = 0, max_len = 30):
 	'''
 	return plot for binned bleu scores
 	'''

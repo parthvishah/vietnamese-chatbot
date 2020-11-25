@@ -125,7 +125,7 @@ def main():
 		decoder_optimizer = optim.SGD(decoder_w_att.parameters(), lr = learning_rate,nesterov = True, momentum = 0.99)
 	elif parser.optimizer == 'adam':
 		encoder_optimizer = optim.Adam(encoder_w_att.parameters(), lr = 5e-3)
-		decoder_optimizer = optim.Adam(decoder_wo_att.parameters(), lr = 5e-3)
+		decoder_optimizer = optim.Adam(decoder_w_att.parameters(), lr = 5e-3)
 	else:
 		raise ValueError('Invalid optimizer!')
 

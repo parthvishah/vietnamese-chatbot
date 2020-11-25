@@ -24,7 +24,7 @@ source activate nmt_env
 PROJECT=/scratch/${NETID}/nlp_project
 
 # Set arguments
-STUDY_NAME=attn_lstm_128bs_512hs_512em_adam_3beam_2layer
+STUDY_NAME=attn_gru_128bs_512em_3beam_2layer
 SAVE_DIR=${PROJECT}/saved_models
 DATA_DIR=${PROJECT}/nmt-vi-en/data/interim/iwslt15-en-vn
 PLOT_DIR=${PROJECT}/plots
@@ -36,14 +36,13 @@ TARGET_NAME='en'
 ENC_EMB=512
 ENC_HIDDEN=512
 ENC_LAYERS=2
-RNN_TYPE='lstm'
+RNN_TYPE='gru'
 DEC_EMB=512
 DEC_HIDDEN=1024
 DEC_LAYERS=1
 EPOCHS=15
 ATTN=TRUE
 BEAM_SIZE=3
-OPTIM=adam
 
 
 cd ${PROJECT}
@@ -66,5 +65,4 @@ python ./nmt-vi-en/scripts/train_attention.py \
 	--dec_layers ${DEC_LAYERS} \
 	--epochs ${EPOCHS} \
 	--beam_size ${BEAM_SIZE} \
-	--optim ${OPTIM} \
 	--attn

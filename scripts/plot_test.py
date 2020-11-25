@@ -145,7 +145,7 @@ def main():
 	print(utils.get_full_filepath(saved_models_dir, encoder_save))
 	print(utils.get_full_filepath(saved_models_dir, encoder_save))
 	log.info(utils.get_full_filepath(saved_models_dir, encoder_save))
- 	log.info(utils.get_full_filepath(saved_models_dir, encoder_save))
+	log.info(utils.get_full_filepath(saved_models_dir, encoder_save))
 	encoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, encoder_save)))
 	decoder_w_att.load_state_dict(torch.load(utils.get_full_filepath(saved_models_dir, decoder_save)))
 

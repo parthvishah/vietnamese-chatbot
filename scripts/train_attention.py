@@ -174,7 +174,7 @@ def main():
 		log.info('Source: {} \nPrediction: {}\n---'.format(src_wo[i], pred_wo[i]))
 
 	log.info("Exported Binned Bleu Score Plot to {}!".format(plots_dir))
-	_, _, fig = utils.get_binned_bl_score(encoder = encoder_w_att, decoder = decoder_w_att, val_dataset = transformed_dataset['validate'], attn_flag = attn_flag, beam_size = beam_size, location = plots_dir, collate = collate_fn_dict['validate'])
+	_, _, fig = utils.get_binned_bl_score(encoder = encoder_w_att, decoder = decoder_w_att, val_dataset = transformed_dataset['validate'], attn_flag = attn_flag, beam_size = beam_size, location = plots_dir, collate = collate_fn_dict['validate'], lang_en = en_lang, lang_vi = vi_lang)
 
 
 if __name__ == "__main__":

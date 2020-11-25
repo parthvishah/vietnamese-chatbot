@@ -36,14 +36,14 @@ Setup
 
 8. When running sbatch jobs make sure you are within the sbatch directory (`/scratch/an3056/nlp_project/nmt-vi-en/sbatch`).
 
-9. Create a copy of `lstm_attention_vi2en.s` and rename it as `{rnn_type}_{attention/no_attention}_vi2en.s` based on what configuration you are running. You will need to also change the hyperparameters and other arguments to your netid within the file. 
+9. Create a copy of `attn_lstm_128bs_512hs_512em_sgd_3beam_1layer.s` and rename it as `{attn/no_attn}_{rnn_type}_{batch_size}bs_{enc_hidden_size}hs_{embed_size}em_{optimizer}_{beam_size}beam_{num_layer}layer.s` based on what configuration you are running. You will need to also change the hyperparameters and other arguments to your netid within the file. 
 
-10. Make sure the `STUDY_NAME` argument is in the following format `{attn/no_attn}_{rnn_type}_{batch_size}_{embedding_size}_{num_RNN_layers}` so that the generated files are easier to maintain.
+10. Make sure the `STUDY_NAME` argument is in the same format as Step 9, so that the generated files are easier to maintain.
 
-9.  Run job `sbatch {rnn_type}_{attention/no_attention}_vi2en.s`
+9.  Run job `sbatch {attn/no_attn}_{rnn_type}_{batch_size}bs_{enc_hidden_size}hs_{embed_size}em_{optimizer}_{beam_size}beam_{num_layer}layer.s`
 	* You can check on the job by `squeue -u <netid>`
 	* You can kill a running job by `scancel jobid`
 	* You can cancel all of your jobs by `scancel -u <netid>`
 
-10. If you need to rerun a configuration over again, you may need to delete generated files such as `lang_obj.pkl` and the encoder/decoder weight files in `/scratch/<netid>/nlp_project/saved_models/vi2en`.
+10. Once you finish running update hyperparameter Google Sheet and add encoder/decoder weight files to Google Drive.
 

@@ -67,7 +67,7 @@ def get_binned_bl_score(encoder, decoder, val_dataset, attn_flag, beam_size, loc
 		temp_dataset.df = temp_dataset.df[(temp_dataset.df['vi_len'] > lower_bound) & (temp_dataset.df['vi_len'] <= upper_bound)];
 
 		# val dataloader
-		temp_loader = DataLoader(temp_dataset, batch_size = 1, collate_fn = vocab_collate_func_val, shuffle = False, num_workers=0)
+		temp_loader = DataLoader(temp_dataset, batch_size = 1, collate_fn = collate, shuffle = False, num_workers=0)
 
 		# evaluate
 		bin_bl_score[i], _, _, _ = validation_beam_search(encoder, decoder, temp_loader, en_lang, vi_lang, attn_str, beam_size, verbose = False)

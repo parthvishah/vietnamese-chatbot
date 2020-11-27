@@ -41,7 +41,6 @@ DEC_EMB=512
 DEC_HIDDEN=1024
 DEC_LAYERS=1
 EPOCHS=15
-ATTN=FALSE
 BEAM_SIZE=3
 OPTIM=sgd
 
@@ -67,4 +66,4 @@ python ./nmt-vi-en/scripts/train_wo_attention.py \
 	--epochs ${EPOCHS} \
 	--beam_size ${BEAM_SIZE} \
 	--optim ${OPTIM} \
-	--attn ${ATTN}
+	--wo_attn

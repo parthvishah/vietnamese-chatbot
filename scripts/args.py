@@ -121,7 +121,10 @@ args.add_argument('--epochs',
 					help='number of epochs')
 args.add_argument('--attn',
  					action='store_true',
- 					help='with encoder attention')
+ 					help='with decoder attention')
+args.add_argument('--wo_attn',
+ 					action='store_false',
+ 					help='without decoder attention')
 args.add_argument('--beam_size',
  					type=int,
 					default=3,

@@ -88,7 +88,7 @@ def main():
 
 	learning_rate = parser.learning_rate
 	num_epochs = parser.epochs
-	attn_flag = parser.attn
+	attn_flag = parser.wo_attn
 	log.info("The attention flag is set to {}.".format(attn_flag))
 	beam_size = parser.beam_size
 	log.info("We evaluate using beam size of {}.".format(beam_size))

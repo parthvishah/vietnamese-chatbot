@@ -7,9 +7,9 @@
 #SBATCH --mem=64000
 #SBATCH --time=48:00:00
 #SBATCH --mail-type=END
-#SBATCH --mail-user=ltk224@nyu.edu
+#SBATCH --mail-user=an3056@nyu.edu
 #SBATCH --job-name="testing"
-#SBATCH --output=/scratch/ltk224/nlp_project/outputs/%j.out
+#SBATCH --output=/scratch/an3056/nlp_project/outputs/%j.out
 
 module purge
 module load anaconda3/5.3.1
@@ -17,7 +17,7 @@ module load cuda/10.0.130
 module load gcc/6.3.0
 
 # Replace with your NetID
-NETID=ltk224
+NETID=an3056
 source activate nmt_env
 
 # Set project working directory

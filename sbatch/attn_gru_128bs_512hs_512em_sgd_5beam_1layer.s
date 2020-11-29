@@ -7,9 +7,9 @@
 #SBATCH --mem=64000
 #SBATCH --time=48:00:00
 #SBATCH --mail-type=END
-#SBATCH --mail-user=ltk224@nyu.edu
+#SBATCH --mail-user=an3056@nyu.edu
 #SBATCH --job-name="testing"
-#SBATCH --output=/scratch/ltk224/nlp_project/outputs/%j.out
+#SBATCH --output=/scratch/an3056/nlp_project/outputs/%j.out
 
 module purge
 module load anaconda3/5.3.1
@@ -17,14 +17,14 @@ module load cuda/10.0.130
 module load gcc/6.3.0
 
 # Replace with your NetID
-NETID=ltk224
+NETID=an3056
 source activate nmt_env
 
 # Set project working directory
 PROJECT=/scratch/${NETID}/nlp_project
 
 # Set arguments
-STUDY_NAME=attn_lstm_128bs_512hs_512em_sgd_3beam_1layer
+STUDY_NAME=attn_lstm_128bs_512hs_512em_sgd_5beam_1layer
 SAVE_DIR=${PROJECT}/saved_models
 DATA_DIR=${PROJECT}/nmt-vi-en/data/interim/iwslt15-en-vn
 PLOT_DIR=${PROJECT}/plots
@@ -36,13 +36,13 @@ TARGET_NAME='en'
 ENC_EMB=512
 ENC_HIDDEN=512
 ENC_LAYERS=1
-RNN_TYPE='lstm'
+RNN_TYPE='gru'
 DEC_EMB=512
 DEC_HIDDEN=1024
 DEC_LAYERS=1
 EPOCHS=15
 ATTN=TRUE
-BEAM_SIZE=3
+BEAM_SIZE=5
 OPTIM=sgd
 
 
